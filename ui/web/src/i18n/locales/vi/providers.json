@@ -406,6 +406,9 @@
     "model": "Mô hình",
     "modelSaved": "Đã lưu mô hình",
     "modelSaveFailed": "Không thể lưu mô hình",
+    "forceModel": "Luôn dùng model này cho mọi agent",
+    "forceModelHint": "Khi bật, mọi agent đều dùng model này bất kể agent có set model riêng hay không. Khi tắt, model agent tự chọn sẽ override model này.",
+    "forceModelSaved": "Đã lưu cài đặt",
     "loginFailed": "Đăng nhập Antigravity thất bại",
     "codeTimeout": "Hết thời gian chờ hoàn tất đăng nhập"
   }

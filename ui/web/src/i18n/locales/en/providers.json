@@ -402,6 +402,9 @@
     "model": "Model",
     "modelSaved": "Model saved",
     "modelSaveFailed": "Failed to save model",
+    "forceModel": "Force this model for all agents",
+    "forceModelHint": "When on, every agent uses this model regardless of its own Model setting. When off, an agent's own model overrides this one.",
+    "forceModelSaved": "Setting saved",
     "loginFailed": "Antigravity login failed",
     "codeTimeout": "Timed out waiting for sign-in to complete"
   }

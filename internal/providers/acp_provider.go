@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/nextlevelbuilder/goclaw/internal/providers/acp"
 )
@@ -20,6 +21,7 @@ type acpSessionEntry struct {
 	proc     *acp.ACPProcess // process that owns this session (for respawn detection)
 	lastUsed time.Time
 	mcpKey   string
+	model    string // model last applied via session/set_model
 }
 
 // ACPProvider implements Provider by orchestrating ACP-compatible agent subprocesses.
@@ -32,6 +34,7 @@ type ACPProvider struct {
 	permMode      string
 	poolKey       string // key for the shared process in the pool (binary + args)
 	sessionModel  string
+	forceModel    bool // when true, sessionModel always wins over a per-request model override
 	sessionMeta   json.RawMessage
 	noClientTools bool
 	bridgeURL     string
@@ -80,6 +83,12 @@ func WithACPSessionMeta(meta json.RawMessage) ACPOption {
 
 func WithACPSessionModel(model string) ACPOption {
 	return func(p *ACPProvider) { p.sessionModel = model }
+}
+
+// WithACPForceModel makes the provider's own session model always win over a
+// per-request model override (e.g. the agent's configured model).
+func WithACPForceModel(force bool) ACPOption {
+	return func(p *ACPProvider) { p.forceModel = force }
 }
 
 func WithACPClientToolsDisabled() ACPOption {
@@ -152,11 +161,19 @@ func (p *ACPProvider) sessionReaper() {
 // resolveSession returns the ACP session ID for a goclaw session key.
 // It creates a new session if none exists, or reloads it after a process respawn.
 // A per-key mutex prevents concurrent creation races for the same session.
-func (p *ACPProvider) resolveSession(ctx context.Context, proc *acp.ACPProcess, goclawKey string, servers []acp.MCPServer) (string, bool, error) {
+// model is the caller's requested model (e.g. the agent's configured model);
+// if empty, or if the provider forces its own model, the provider's own
+// default session model is used instead.
+func (p *ACPProvider) resolveSession(ctx context.Context, proc *acp.ACPProcess, goclawKey string, servers []acp.MCPServer, model string) (string, bool, error) {
 	actual, _ := p.sessionMu.LoadOrStore(goclawKey, &sync.Mutex{})
 	mu := actual.(*sync.Mutex)
 	mu.Lock()
 	defer mu.Unlock()
+
+	effModel := model
+	if p.forceModel || effModel == "" {
+		effModel = p.sessionModel
+	}
 
 	mcpKey := mcpServersKey(servers)
 	if val, ok := p.acpSessions.Load(goclawKey); ok {
@@ -164,6 +181,10 @@ func (p *ACPProvider) resolveSession(ctx context.Context, proc *acp.ACPProcess, 
 		if entry.proc == proc && entry.mcpKey == mcpKey {
 			// Same process instance: session is still live, just update last-used
 			entry.lastUsed = time.Now()
+			if effModel != "" && effModel != entry.model {
+				p.applySessionModel(ctx, proc, entry.id, effModel)
+				entry.model = effModel
+			}
 			return entry.id, false, nil
 		}
 		slog.Info("acp: restoring session",
@@ -171,8 +192,8 @@ func (p *ACPProvider) resolveSession(ctx context.Context, proc *acp.ACPProcess, 
 		if proc.AgentCaps().LoadSession {
 			sid, err := proc.LoadSessionWithMeta(ctx, entry.id, p.sessionMeta, servers)
 			if err == nil {
-				p.applySessionModel(ctx, proc, sid)
-				p.acpSessions.Store(goclawKey, &acpSessionEntry{id: sid, proc: proc, lastUsed: time.Now(), mcpKey: mcpKey})
+				p.applySessionModel(ctx, proc, sid, effModel)
+				p.acpSessions.Store(goclawKey, &acpSessionEntry{id: sid, proc: proc, lastUsed: time.Now(), mcpKey: mcpKey, model: effModel})
 				return sid, false, nil
 			}
 			slog.Warn("acp: session/load failed, creating new session", "old_sid", entry.id, "error", err)
@@ -189,17 +210,17 @@ func (p *ACPProvider) resolveSession(ctx context.Context, proc *acp.ACPProcess, 
 	if err != nil {
 		return "", false, err
 	}
-	p.applySessionModel(ctx, proc, sid)
-	p.acpSessions.Store(goclawKey, &acpSessionEntry{id: sid, proc: proc, lastUsed: time.Now(), mcpKey: mcpKey})
+	p.applySessionModel(ctx, proc, sid, effModel)
+	p.acpSessions.Store(goclawKey, &acpSessionEntry{id: sid, proc: proc, lastUsed: time.Now(), mcpKey: mcpKey, model: effModel})
 	return sid, true, nil
 }
 
-func (p *ACPProvider) applySessionModel(ctx context.Context, proc *acp.ACPProcess, sid string) {
-	if p.sessionModel == "" {
+func (p *ACPProvider) applySessionModel(ctx context.Context, proc *acp.ACPProcess, sid, model string) {
+	if model == "" {
 		return
 	}
-	if err := proc.SetModel(ctx, sid, p.sessionModel); err != nil {
-		slog.Warn("acp: set model failed", "provider", p.name, "model", p.sessionModel, "error", err)
+	if err := proc.SetModel(ctx, sid, model); err != nil {
+		slog.Warn("acp: set model failed", "provider", p.name, "model", model, "error", err)
 	}
 }
 
@@ -232,7 +253,7 @@ func (p *ACPProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse,
 		return nil, fmt.Errorf("acp: spawn failed: %w", err)
 	}
 
-	acpSessionID, fresh, err := p.resolveSession(ctx, proc, sessionKey, p.mcpServers(req, sessionKey))
+	acpSessionID, fresh, err := p.resolveSession(ctx, proc, sessionKey, p.mcpServers(req, sessionKey), req.Model)
 	if err != nil {
 		return nil, err
 	}
@@ -269,10 +290,12 @@ func (p *ACPProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse,
 
 	slog.Info("acp: chat completed", "session", sessionKey, "sid", acpSessionID,
 		"stopReason", mapStopReason(promptResp), "updates", updateCount, "contentLen", buf.Len())
+	inputTokens := estimateACPTokens(acpContentText(content))
+	outputTokens := estimateACPTokens(buf.String())
 	return &ChatResponse{
 		Content:      buf.String(),
 		FinishReason: mapStopReason(promptResp),
-		Usage:        &Usage{},
+		Usage:        &Usage{PromptTokens: inputTokens, CompletionTokens: outputTokens, TotalTokens: inputTokens + outputTokens},
 	}, nil
 }
 
@@ -288,7 +311,7 @@ func (p *ACPProvider) ChatStream(ctx context.Context, req ChatRequest, onChunk f
 		return nil, fmt.Errorf("acp: spawn failed: %w", err)
 	}
 
-	acpSessionID, fresh, err := p.resolveSession(ctx, proc, sessionKey, p.mcpServers(req, sessionKey))
+	acpSessionID, fresh, err := p.resolveSession(ctx, proc, sessionKey, p.mcpServers(req, sessionKey), req.Model)
 	if err != nil {
 		return nil, err
 	}
@@ -353,10 +376,12 @@ func (p *ACPProvider) ChatStream(ctx context.Context, req ChatRequest, onChunk f
 	slog.Info("acp: chat stream completed", "session", sessionKey, "sid", acpSessionID,
 		"stopReason", mapStopReason(promptResp), "updates", updateCount, "contentLen", buf.Len())
 
+	inputTokens := estimateACPTokens(acpContentText(content))
+	outputTokens := estimateACPTokens(buf.String())
 	return &ChatResponse{
 		Content:      buf.String(),
 		FinishReason: mapStopReason(promptResp),
-		Usage:        &Usage{},
+		Usage:        &Usage{PromptTokens: inputTokens, CompletionTokens: outputTokens, TotalTokens: inputTokens + outputTokens},
 	}, nil
 }
 
@@ -449,6 +474,32 @@ func (p *ACPProvider) Close() error {
 	})
 	_ = p.bridge.Close()
 	return p.pool.Close()
+}
+
+// estimateACPTokens roughly estimates token count from text length.
+// shortcut: the ACP protocol (session/prompt, session/update) carries no token
+// usage at all, so Chat/ChatStream can't report real Usage like HTTP-based
+// providers (OpenRouter etc.) do. ~4 chars/token is a standard English/code
+// approximation; upgrade to a real count if agy/ACP ever adds usage reporting.
+func estimateACPTokens(text string) int {
+	if text == "" {
+		return 0
+	}
+	if n := utf8.RuneCountInString(text) / 4; n > 0 {
+		return n
+	}
+	return 1
+}
+
+// acpContentText joins the text blocks of an ACP content payload, for token estimation.
+func acpContentText(blocks []acp.ContentBlock) string {
+	var sb strings.Builder
+	for _, b := range blocks {
+		if b.Type == "text" {
+			sb.WriteString(b.Text)
+		}
+	}
+	return sb.String()
 }
 
 // extractACPContent extracts user message + images from ChatRequest into ACP ContentBlocks.

@@ -176,6 +176,7 @@ export function TracesPage() {
                 <tr className="border-b bg-muted/50">
                   <th className="px-4 py-3 text-left font-medium w-[36%] max-w-[280px]">{t("columns.name")}</th>
                   <th className="px-3 py-3 text-left font-medium w-28 whitespace-nowrap">{t("columns.status")}</th>
+                  <th className="px-4 py-3 text-left font-medium w-32 whitespace-nowrap">{t("columns.model")}</th>
                   <th className="px-4 py-3 text-left font-medium w-28 whitespace-nowrap">{t("columns.tokens")}</th>
                   <th className="px-4 py-3 text-center font-medium w-20 whitespace-nowrap">{t("columns.spans")}</th>
                   <th className="px-4 py-3 text-right font-medium w-28 whitespace-nowrap">{t("columns.time")}</th>
@@ -243,6 +244,13 @@ export function TracesPage() {
                             </Button>
                           )}
                         </div>
+                      </td>
+                      <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap">
+                        {trace.model ? (
+                          <span className="truncate text-xs" title={trace.model}>{trace.model}</span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-2.5 text-muted-foreground whitespace-nowrap">
                         <div>{formatTokens(trace.total_input_tokens)} / {formatTokens(trace.total_output_tokens)}</div>

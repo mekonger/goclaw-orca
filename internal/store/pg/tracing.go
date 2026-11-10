@@ -14,6 +14,9 @@ import (
 	"github.com/nextlevelbuilder/goclaw/internal/store"
 )
 
+// latestLLMModelSubquery selects the model of the most recent llm_call span of a trace.
+const latestLLMModelSubquery = `(SELECT s.model FROM spans s WHERE s.trace_id = traces.id AND s.span_type = 'llm_call' AND s.model IS NOT NULL ORDER BY s.start_time DESC LIMIT 1) AS model`
+
 // PGTracingStore implements store.TracingStore backed by Postgres.
 type PGTracingStore struct {
 	db *sql.DB
@@ -62,7 +65,8 @@ func (s *PGTracingStore) GetTrace(ctx context.Context, traceID uuid.UUID) (*stor
 	query := `SELECT id, parent_trace_id, agent_id, user_id, session_key, run_id, start_time, end_time,
 		 duration_ms, name, channel, input_preview, output_preview,
 		 total_input_tokens, total_output_tokens, COALESCE(total_cost, 0) AS total_cost, span_count, llm_call_count, tool_call_count,
-		 status, error, COALESCE(metadata, '{}'::jsonb) AS metadata, COALESCE(tags, '{}') AS tags, team_id, created_at
+		 status, error, COALESCE(metadata, '{}'::jsonb) AS metadata, COALESCE(tags, '{}') AS tags, team_id, created_at,
+		 ` + latestLLMModelSubquery + `
 		 FROM traces WHERE id = $1`
 	qArgs := []any{traceID}
 	if !store.IsCrossTenant(ctx) {
@@ -246,7 +250,8 @@ func (s *PGTracingStore) ListTraces(ctx context.Context, opts store.TraceListOpt
 	q := `SELECT id, parent_trace_id, agent_id, user_id, session_key, run_id, start_time, end_time,
 		 duration_ms, name, channel, input_preview, output_preview,
 		 total_input_tokens, total_output_tokens, COALESCE(total_cost, 0) AS total_cost, span_count, llm_call_count, tool_call_count,
-		 status, error, metadata, tags, team_id, created_at
+		 status, error, metadata, tags, team_id, created_at,
+		 ` + latestLLMModelSubquery + `
 		 FROM traces` + where
 
 	limit := opts.Limit
@@ -266,7 +271,8 @@ func (s *PGTracingStore) ListChildTraces(ctx context.Context, parentTraceID uuid
 	q := `SELECT id, parent_trace_id, agent_id, user_id, session_key, run_id, start_time, end_time,
 		 duration_ms, name, channel, input_preview, output_preview,
 		 total_input_tokens, total_output_tokens, COALESCE(total_cost, 0) AS total_cost, span_count, llm_call_count, tool_call_count,
-		 status, error, metadata, tags, team_id, created_at
+		 status, error, metadata, tags, team_id, created_at,
+		 ` + latestLLMModelSubquery + `
 		 FROM traces WHERE parent_trace_id = $1`
 	qArgs := []any{parentTraceID}
 

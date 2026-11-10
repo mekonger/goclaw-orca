@@ -64,6 +64,7 @@ type TraceData struct {
 	Tags              []string        `json:"tags,omitempty" db:"tags"`
 	TeamID            *uuid.UUID      `json:"team_id,omitempty" db:"team_id"`
 	CreatedAt         time.Time       `json:"created_at" db:"created_at"`
+	Model             string          `json:"model,omitempty" db:"model"` // model of the most recent llm_call span in this trace
 }
 
 // SpanData represents a single operation within a trace.

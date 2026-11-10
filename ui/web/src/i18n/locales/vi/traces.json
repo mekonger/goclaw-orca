@@ -56,7 +56,8 @@
     "duration": "Thời lượng",
     "tokens": "Token",
     "spans": "Khoảng",
-    "time": "Thời gian"
+    "time": "Thời gian",
+    "model": "Model"
   },
   "source": {
     "direct": "Trực tiếp",

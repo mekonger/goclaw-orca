@@ -424,6 +424,9 @@
     "model": "模型",
     "modelSaved": "模型已保存",
     "modelSaveFailed": "保存模型失败",
+    "forceModel": "为所有智能体强制使用此模型",
+    "forceModelHint": "开启后，无论智能体自身是否设置了模型，都统一使用此模型。关闭后，智能体自己设置的模型将覆盖此模型。",
+    "forceModelSaved": "设置已保存",
     "loginFailed": "Antigravity 登录失败",
     "codeTimeout": "等待登录完成超时"
   }

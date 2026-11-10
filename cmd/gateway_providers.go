@@ -618,11 +618,12 @@ func registerACPFromConfig(registry *providers.Registry, cfg config.ACPConfig, s
 func registerACPFromDB(registry *providers.Registry, p store.LLMProviderData, shellDenyGroups map[string]bool, gw config.GatewayConfig) {
 	isAgy := p.ProviderType == store.ProviderAntigravityCLI
 	var settings struct {
-		Args     []string `json:"args"`
-		IdleTTL  string   `json:"idle_ttl"`
-		PermMode string   `json:"perm_mode"`
-		WorkDir  string   `json:"work_dir"`
-		Model    string   `json:"model"`
+		Args       []string `json:"args"`
+		IdleTTL    string   `json:"idle_ttl"`
+		PermMode   string   `json:"perm_mode"`
+		WorkDir    string   `json:"work_dir"`
+		Model      string   `json:"model"`
+		ForceModel bool     `json:"force_model"`
 	}
 	if p.Settings != nil {
 		if err := json.Unmarshal(p.Settings, &settings); err != nil {
@@ -637,7 +638,7 @@ func registerACPFromDB(registry *providers.Registry, p store.LLMProviderData, sh
 	}
 
 	if isAgy {
-		registerAntigravityFromDB(registry, p, settings.Model, idleTTL, shellDenyGroups, gw)
+		registerAntigravityFromDB(registry, p, settings.Model, settings.ForceModel, idleTTL, shellDenyGroups, gw)
 		return
 	}
 
@@ -662,11 +663,12 @@ func registerACPFromDB(registry *providers.Registry, p store.LLMProviderData, sh
 		binary, settings.Args, workDir, idleTTL, tools.ResolveDenyPatterns(shellDenyGroups),
 		providers.WithACPName(p.Name),
 		providers.WithACPModel(p.Name),
+		providers.WithACPForceModel(settings.ForceModel),
 	))
 	slog.Info("registered provider from DB", "name", p.Name, "type", "acp")
 }
 
-func registerAntigravityFromDB(registry *providers.Registry, p store.LLMProviderData, model string, idleTTL time.Duration, shellDenyGroups map[string]bool, gw config.GatewayConfig) {
+func registerAntigravityFromDB(registry *providers.Registry, p store.LLMProviderData, model string, forceModel bool, idleTTL time.Duration, shellDenyGroups map[string]bool, gw config.GatewayConfig) {
 	if err := antigravity.Ready(); err != nil {
 		slog.Warn("antigravity: runtime not configured, skipping", "name", p.Name, "error", err)
 		return
@@ -684,6 +686,7 @@ func registerAntigravityFromDB(registry *providers.Registry, p store.LLMProvider
 		providers.WithACPClientToolsDisabled(),
 		providers.WithACPSessionMeta(antigravity.SessionMeta(bridgeURL != "")),
 		providers.WithACPPermMode("approve-all"),
+		providers.WithACPForceModel(forceModel),
 	}
 	if bridgeURL != "" {
 		opts = append(opts, providers.WithACPMCPBridge(bridgeURL, gw.Token))

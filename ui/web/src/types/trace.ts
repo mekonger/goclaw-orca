@@ -23,6 +23,7 @@ export interface TraceData {
   tags?: string[];
   metadata?: { total_cache_read_tokens?: number; total_cache_creation_tokens?: number };
   created_at: string;
+  model?: string;
 }
 
 export interface SpanData {

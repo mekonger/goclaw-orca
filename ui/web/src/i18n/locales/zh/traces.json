@@ -3,6 +3,7 @@
   "columns": {
     "duration": "耗时",
     "name": "名称",
+    "model": "模型",
     "spans": "跨度",
     "status": "状态",
     "time": "时间",

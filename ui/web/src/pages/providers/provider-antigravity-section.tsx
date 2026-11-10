@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { CheckCircle, Copy, ExternalLink, Loader2 } from "lucide-react";
 import { useHttp } from "@/hooks/use-ws";
 import { queryKeys } from "@/lib/query-keys";
@@ -172,7 +173,12 @@ export function AntigravityLoginSection({ providerId, settings, onClose }: Antig
         </div>
       )}
 
-      {connected && <AntigravityModelPicker providerId={providerId} settings={settings} />}
+      {connected && (
+        <>
+          <AntigravityModelPicker providerId={providerId} settings={settings} />
+          <AntigravityForceModelToggle providerId={providerId} settings={settings} />
+        </>
+      )}
 
       {onClose && connected && (
         <div className="flex justify-end">
@@ -222,6 +228,43 @@ function AntigravityModelPicker({ providerId, settings }: { providerId: string; 
           </SelectContent>
         </Select>
       )}
+    </div>
+  );
+}
+
+function AntigravityForceModelToggle({ providerId, settings }: { providerId: string; settings?: Record<string, unknown> }) {
+  const { t } = useTranslation("providers");
+  const http = useHttp();
+  const queryClient = useQueryClient();
+  const saved = settings?.force_model === true;
+  const [checked, setChecked] = useState(saved);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => { setChecked(saved); }, [saved, providerId]);
+
+  const handleChange = async (force: boolean) => {
+    setChecked(force);
+    setSaving(true);
+    try {
+      const latest = await http.get<{ settings?: Record<string, unknown> }>(`/v1/providers/${providerId}`);
+      await http.put(`/v1/providers/${providerId}`, { settings: { ...latest.settings, force_model: force } });
+      queryClient.invalidateQueries({ queryKey: ["providers"] });
+      toast.success(t("antigravity.forceModelSaved"));
+    } catch (err) {
+      setChecked(!force);
+      toast.error(t("antigravity.modelSaveFailed"), err instanceof Error ? err.message : "");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between gap-4 pt-1">
+      <div className="space-y-0.5">
+        <Label htmlFor="agy-force-model" className="text-sm font-normal cursor-pointer">{t("antigravity.forceModel")}</Label>
+        <p className="text-xs text-muted-foreground">{t("antigravity.forceModelHint")}</p>
+      </div>
+      <Switch id="agy-force-model" checked={checked} onCheckedChange={handleChange} disabled={saving} />
     </div>
   );
 }

@@ -370,6 +370,9 @@
     "model": "모델",
     "modelSaved": "모델이 저장되었습니다",
     "modelSaveFailed": "모델을 저장하지 못했습니다",
+    "forceModel": "모든 에이전트에 이 모델 강제 적용",
+    "forceModelHint": "켜면 에이전트가 자체 모델을 설정했는지와 관계없이 항상 이 모델을 사용합니다. 끄면 에이전트 자체 모델이 이 모델을 재정의합니다.",
+    "forceModelSaved": "설정이 저장되었습니다",
     "loginFailed": "Antigravity 로그인 실패",
     "codeTimeout": "로그인 완료 대기 시간이 초과되었습니다"
   }

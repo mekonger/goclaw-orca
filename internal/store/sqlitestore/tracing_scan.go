@@ -21,11 +21,12 @@ func scanTraceRow(row *sql.Row) (*store.TraceData, error) {
 	var metadata *[]byte
 	var tags []byte
 	var startTime, createdAt sqliteTime
+	var model *string
 
 	err := row.Scan(&d.ID, &parentTraceID, &agentID, &userID, &sessionKey, &runID, &startTime, &endTime,
 		&durationMS, &name, &channel, &inputPreview, &outputPreview,
 		&d.TotalInputTokens, &d.TotalOutputTokens, &d.TotalCost, &d.SpanCount, &d.LLMCallCount, &d.ToolCallCount,
-		&d.Status, &errStr, &metadata, &tags, &teamID, &createdAt)
+		&d.Status, &errStr, &metadata, &tags, &teamID, &createdAt, &model)
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +37,7 @@ func scanTraceRow(row *sql.Row) (*store.TraceData, error) {
 		endTimePtr = &endTime.Time
 	}
 	applyTraceNullables(&d, parentTraceID, agentID, teamID, userID, sessionKey, runID, name, channel, inputPreview, outputPreview, errStr, endTimePtr, durationMS, metadata, tags)
+	d.Model = derefStr(model)
 	return &d, nil
 }
 
@@ -50,11 +52,12 @@ func scanTraceRows(rows *sql.Rows) ([]store.TraceData, error) {
 		var metadata *[]byte
 		var tags []byte
 		var startTime, createdAt sqliteTime
+		var model *string
 
 		if err := rows.Scan(&d.ID, &parentTraceID, &agentID, &userID, &sessionKey, &runID, &startTime, &endTime,
 			&durationMS, &name, &channel, &inputPreview, &outputPreview,
 			&d.TotalInputTokens, &d.TotalOutputTokens, &d.TotalCost, &d.SpanCount, &d.LLMCallCount, &d.ToolCallCount,
-			&d.Status, &errStr, &metadata, &tags, &teamID, &createdAt); err != nil {
+			&d.Status, &errStr, &metadata, &tags, &teamID, &createdAt, &model); err != nil {
 			slog.Warn("tracing: trace scan failed", "error", err)
 			continue
 		}
@@ -65,6 +68,7 @@ func scanTraceRows(rows *sql.Rows) ([]store.TraceData, error) {
 		endTimePtr = &endTime.Time
 	}
 	applyTraceNullables(&d, parentTraceID, agentID, teamID, userID, sessionKey, runID, name, channel, inputPreview, outputPreview, errStr, endTimePtr, durationMS, metadata, tags)
+		d.Model = derefStr(model)
 		result = append(result, d)
 	}
 	return result, rows.Err()

@@ -4,6 +4,32 @@ Significant changes, features, and fixes in reverse chronological order.
 
 ---
 
+## 2026-11-09
+
+### Trace model column + Antigravity force-model toggle
+
+**Features**
+
+- Traces list now shows the model of each trace's most recent `llm_call` span (`ListTraces`/`ListChildTraces`/`GetTrace` in both the PostgreSQL and SQLite tracing stores, exposed as `model` on `/v1/traces`). The web Traces table has a new Model column.
+- Antigravity CLI provider settings get a "Force this model for all agents" toggle (`settings.force_model`). When on, the provider's own configured model always wins over an agent's `Model` override (via `ACPProvider.WithACPForceModel`); when off, the per-agent override from the 2026-11-08 fix applies as before.
+
+**Fixes**
+
+- Traces for ACP-based providers (Antigravity CLI, Claude CLI, generic ACP) always showed 0/0 input/output tokens, unlike HTTP-based providers (OpenRouter etc.). The ACP protocol (`session/prompt`, `session/update`) carries no token usage at all, so `ACPProvider.Chat`/`ChatStream` always returned an empty `Usage{}`. They now estimate input/output tokens from the actual text sent/received (~4 chars/token), so the Tokens column is populated and provider pricing (cost per token, configured on the provider) is applied instead of always computing $0 cost. This is an estimate, not an exact count — upgrade if the ACP protocol ever reports real usage.
+
+---
+
+## 2026-11-08
+
+### Agent model selection ignored on ACP-based providers
+
+**Fixes**
+
+- The per-agent `Model` field now takes effect for ACP-based providers (Antigravity CLI, Claude CLI, generic ACP). Previously `ACPProvider.Chat`/`ChatStream` never read the request's model; the model was fixed to whatever was configured on the provider at creation time (`session/set_model` applied only once, from the provider's own settings), so picking a different model on the Agent screen silently had no effect.
+- When the agent sets its own model, it is now applied via `session/set_model` on session creation, and reapplied if the agent's model changes mid-conversation on an already-live session. An agent with no model override still falls back to the provider's default model, unchanged.
+
+---
+
 ## 2026-11-08
 
 ### Orca servers tab

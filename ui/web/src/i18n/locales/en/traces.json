@@ -56,7 +56,8 @@
     "duration": "Duration",
     "tokens": "Tokens",
     "spans": "Spans",
-    "time": "Time"
+    "time": "Time",
+    "model": "Model"
   },
   "source": {
     "direct": "Direct",
