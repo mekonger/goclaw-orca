@@ -83,6 +83,17 @@ else
   echo "  [exists]    GOCLAW_GATEWAY_TOKEN"
 fi
 
+# 4. Auto-generate POSTGRES_PASSWORD if missing (docker-compose.postgres.yml
+#    falls back to the weak default "goclaw" when this is empty)
+current_pg="$(get_env_val POSTGRES_PASSWORD)"
+if [ -z "$current_pg" ]; then
+  new_pg="$(gen_hex 24)"
+  set_env_val "POSTGRES_PASSWORD" "$new_pg"
+  echo "  [generated] POSTGRES_PASSWORD"
+else
+  echo "  [exists]    POSTGRES_PASSWORD"
+fi
+
 echo ""
 echo "=== Done ==="
 echo ""
