@@ -1,0 +1,18 @@
+# Antigravity CLI overlay — lets goclaw manage nested `agy` containers via Docker.
+#
+# goclaw orchestrates one `agy` container per provider by shelling out to `docker`
+# from inside its own container (docker-outside-of-docker). This overlay installs
+# the docker CLI in the image and exposes the host Docker socket.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.postgres.yml -f docker-compose.antigravity.yml up -d --build
+
+services:
+  goclaw:
+    build:
+      args:
+        ENABLE_SANDBOX: "true"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add:
+      - ${DOCKER_GID:-999}

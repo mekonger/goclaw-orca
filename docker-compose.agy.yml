@@ -21,7 +21,7 @@ services:
     <<: *agy
     container_name: agy-acc1
     volumes:
-      - ${HOME}/.local/bin/agy:/usr/local/bin/agy:ro
+      - ${HOME}/.local/bin/agy-linux-arm64:/usr/local/bin/agy:ro
       - agy-acc1-home:/home/agy
       - goclaw-data:/app/data
 

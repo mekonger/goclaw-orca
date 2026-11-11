@@ -33,6 +33,23 @@ if [ "$(id -u)" = "0" ] && [ -d /app/workspace ]; then
     -exec chown goclaw:goclaw {} + 2>/dev/null || true
 fi
 
+# Grant goclaw access to the bind-mounted Docker socket (sandbox/antigravity
+# overlays). `--group-add` on the container only affects this (root) process;
+# su-exec calls initgroups() for the goclaw user below, which replaces the
+# supplementary group list, dropping that grant. Adding goclaw to a group
+# matching the socket's actual gid here survives the privilege drop.
+if [ "$(id -u)" = "0" ] && [ -S /var/run/docker.sock ]; then
+  sock_gid="$(stat -c '%g' /var/run/docker.sock 2>/dev/null || true)"
+  if [ -n "$sock_gid" ]; then
+    grp_name="$(awk -F: -v g="$sock_gid" '$3==g{print $1; exit}' /etc/group)"
+    if [ -z "$grp_name" ]; then
+      addgroup -g "$sock_gid" dockerhost 2>/dev/null || true
+      grp_name=dockerhost
+    fi
+    addgroup goclaw "$grp_name" 2>/dev/null || true
+  fi
+fi
+
 # Python: allow agent to pip install to writable target dir
 export PYTHONPATH="$RUNTIME_DIR/pip:${PYTHONPATH:-}"
 export PIP_TARGET="$RUNTIME_DIR/pip"
