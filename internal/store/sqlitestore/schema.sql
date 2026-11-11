@@ -2414,6 +2414,8 @@ CREATE TABLE IF NOT EXISTS orca_servers (
     created_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     updated_at         TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
     created_by         VARCHAR(255) NOT NULL DEFAULT '',
+    agents             TEXT NOT NULL DEFAULT '[]',
+    agent_health       TEXT NOT NULL DEFAULT '{}',
     UNIQUE (tenant_id, label)
 );
 CREATE INDEX IF NOT EXISTS idx_orca_servers_checked ON orca_servers (last_checked_at);

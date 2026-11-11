@@ -6,6 +6,26 @@ import i18n from "@/i18n";
 
 export type OrcaServerStatus = "unknown" | "healthy" | "unhealthy" | "error" | "cli_missing";
 
+export type OrcaAgentTier = "routine" | "hard" | "planning";
+export type OrcaAgentStatus = "unknown" | "healthy" | "unhealthy";
+
+export interface OrcaAgentConfig {
+  key: string;
+  agent: string;
+  model?: string;
+  tier: OrcaAgentTier;
+  description: string;
+  enabled: boolean;
+  fallback?: boolean;
+}
+
+export interface OrcaAgentHealth {
+  status: OrcaAgentStatus;
+  error?: string;
+  checked_at: string;
+  last_ok_at?: string | null;
+}
+
 export interface OrcaServer {
   id: string;
   tenant_id: string;
@@ -20,6 +40,8 @@ export interface OrcaServer {
   created_at: string;
   updated_at: string;
   created_by: string;
+  agents?: OrcaAgentConfig[];
+  agent_health?: Record<string, OrcaAgentHealth>;
 }
 
 export interface OrcaServerCreateInput {
@@ -111,6 +133,20 @@ export function useOrcaServers() {
     [http, invalidate, checkServer],
   );
 
+  const updateAgents = useCallback(
+    async (id: string, agents: OrcaAgentConfig[]) => {
+      try {
+        await http.put<OrcaServer>(`${BASE}/${id}/agents`, { agents });
+        await invalidate();
+        toast.success(i18n.t("orca-servers:toast.agentsSaved"));
+      } catch (err) {
+        toast.error(i18n.t("orca-servers:toast.saveFailed"), errMsg(err));
+        throw err;
+      }
+    },
+    [http, invalidate],
+  );
+
   const deleteServer = useCallback(
     async (id: string) => {
       try {
@@ -125,5 +161,5 @@ export function useOrcaServers() {
     [http, invalidate],
   );
 
-  return { servers, loading, refresh: invalidate, createServer, updateServer, deleteServer, checkServer, checkAll };
+  return { servers, loading, refresh: invalidate, createServer, updateServer, updateAgents, deleteServer, checkServer, checkAll };
 }

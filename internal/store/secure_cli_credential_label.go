@@ -93,6 +93,10 @@ func PrepareSecureCLICredentialLabel(raw string) (string, error) {
 }
 
 func SanitizeSecureCLICredentialDescription(s string) string {
+	return sanitizeDescription(s, SecureCLICredentialDescriptionMaxLen)
+}
+
+func sanitizeDescription(s string, maxLen int) string {
 	var sb strings.Builder
 	for _, r := range s {
 		if unicode.IsControl(r) {
@@ -103,8 +107,8 @@ func SanitizeSecureCLICredentialDescription(s string) string {
 	}
 	out := strings.TrimSpace(sb.String())
 	runes := []rune(out)
-	if len(runes) > SecureCLICredentialDescriptionMaxLen {
-		out = strings.TrimSpace(string(runes[:SecureCLICredentialDescriptionMaxLen]))
+	if len(runes) > maxLen {
+		out = strings.TrimSpace(string(runes[:maxLen]))
 	}
 	return out
 }

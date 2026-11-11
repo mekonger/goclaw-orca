@@ -155,7 +155,7 @@ var CLIPresets = map[string]CLIPreset{
 		},
 		DenyVerbose: nil,
 		Timeout:     120,
-		Tips:        "Start every session with `orca status --json`. Put the subcommand first and always pass --json. When the tools section lists several servers, pick one with `orca --server <label> <subcommand> --json` (--server must be the first argument); otherwise the paired runtime is fixed by the credential. Never pass --pairing-code or --environment.",
+		Tips:        "Start every session with `orca status --json`. Put the subcommand first and always pass --json. When the tools section lists several servers, pick one with `orca --server <label> <subcommand> --json` (--server must be the first argument); otherwise the paired runtime is fixed by the credential. Never pass --pairing-code or --environment. For new coding work pass `--agent auto` (with `--server <label>`) and no `--model`/`--effort`; the gateway picks the agent and prints a `routed:` line. Name an agent only when the requester asks, or when escalating a failed run.",
 	},
 	"rapidapi": {
 		BinaryName:  "rapidapi",

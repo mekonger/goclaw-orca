@@ -1,0 +1,11 @@
+{
+  "id": "local",
+  "ok": false,
+  "error": {
+    "code": "invalid_argument",
+    "message": "Unknown TUI agent \"nosuchagent\""
+  },
+  "_meta": {
+    "runtimeId": null
+  }
+}

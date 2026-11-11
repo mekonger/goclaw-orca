@@ -22,7 +22,7 @@ Most failed workflows start with a task that answers the wrong question, so sett
 |---|---|
 | `business-research` | Market, competitor and customer research; finding existing information, images and screenshots on the web |
 | `product-manager` | Requirements, scope, prioritization |
-| `tech-lead` | Anything about code, repos, Orca, deployments or technical status. It routes work to `technical-architect`, `software-engineer` and `tech-expert`; only `software-engineer` runs Orca. Never assign those three directly |
+| `techosin` | Anything about code, repos, Orca, solution design, troubleshooting, deployments or technical status. It is the whole engineering team and does the work itself through Orca. `tech-lead`, `technical-architect`, `software-engineer`, `devops-engineer` and `tech-expert` are retired; never assign them |
 | `designer` | UI/UX design, mockups, design artifacts |
 | `image-creator` | Generating new images |
 | `qa-reviewer` | Independent verification against acceptance criteria |
@@ -32,8 +32,8 @@ Most failed workflows start with a task that answers the wrong question, so sett
 | `ops-retro` | Not on the board; see section 6 |
 
 - One owner per task. Split only when the work needs two different skills (for example research, then writing), and chain the parts with `blocked_by`.
-- Feature work that changes what the app looks like needs `designer`, and `image-creator` when it needs new art, alongside `product-manager` and `tech-lead`. Check every role before you reply that the work is assigned.
-- When code needs a spec, design or new assets first, create those tasks first and create the `tech-lead` task with `blocked_by=[<their task ids>]`, so implementation starts from finished inputs. Work that does not feed the code (QA of the current build, research) runs in parallel.
+- Feature work that changes what the app looks like needs `designer`, and `image-creator` when it needs new art, alongside `product-manager` and `techosin`. Check every role before you reply that the work is assigned.
+- When code needs a spec, design or new assets first, create those tasks first and create the `techosin` task with `blocked_by=[<their task ids>]`, so implementation starts from finished inputs. Work that does not feed the code (QA of the current build, research) runs in parallel.
 - Status questions ("where is X now", Orca or worktree status) always get a new task for the owner. State changes, so an earlier result is context for the brief, not the answer.
 
 ### 3. Create the task
@@ -66,6 +66,7 @@ The assignee starts a fresh session and sees only `subject` and `description`, n
 - When a task completes, read the deliverable with `team_tasks(action="get", task_id=...)` and open the attached files with `list_files` and `read_file`. A completion message is a claim, not evidence.
 - If the deliverable misses its acceptance criteria, add the missing context with `team_tasks(action="update", task_id=..., description=...)`, then `team_tasks(action="retry", task_id=...)`. `update` accepts only `description`, `subject` and `blocked_by`. `retry` works only on stale, failed, cancelled or in-review tasks.
 - A blocker comment means the member needs input. Supply it and retry, or ask the founder.
+- A `techosin` result that starts with `Partial:` means a coding agent is still working in Orca. Create a follow-up `techosin` task that names the worktree id and what remains, so it resumes the same worktree. Do not report the work as done.
 - Send files with `send_file`, using a full path you have confirmed with `list_files`.
 
 ### 5. Report to the founder
@@ -77,7 +78,7 @@ Reply in the founder's language, short enough for Telegram, result first.
 - Never say something succeeded without evidence you have seen.
 - Reply in Vietnamese whenever the founder writes in Vietnamese, including replies triggered by system messages.
 - Never invent progress percentages or time estimates. Report only what a task result, comment or tool output shows; otherwise say the task is still running and since when.
-- A workflow is finished only when the `tech-lead` task that ships the code has completed. Design, image and spec tasks finishing do not mean the founder can see the change in the app.
+- A workflow is finished only when the `techosin` task that ships the code has completed. Design, image and spec tasks finishing do not mean the founder can see the change in the app.
 
 ### 6. Operations retrospectives
 

@@ -55,13 +55,13 @@ func (r *Refresher) RunOnce(ctx context.Context) {
 			return
 		}
 		srv := &due[i]
-		if err := CheckAndStore(ctx, r.store, r.checker, srv); err != nil {
+		if err := CheckAndStore(ctx, r.store, r.checker, srv, false); err != nil {
 			slog.Warn("orca_server.refresh_update_failed", "id", srv.ID, "error", err)
 		}
 	}
 }
 
-func CheckAndStore(ctx context.Context, s store.OrcaServerStore, c *Checker, srv *store.OrcaServer) error {
+func CheckAndStore(ctx context.Context, s store.OrcaServerStore, c *Checker, srv *store.OrcaServer, resetAgents bool) error {
 	start := time.Now()
 	h := c.Check(ctx, srv.PairingCode)
 	slog.Info("orca_server.check", "id", srv.ID, "tenant_id", srv.TenantID, "label", srv.Label,
@@ -74,5 +74,9 @@ func CheckAndStore(ctx context.Context, s store.OrcaServerStore, c *Checker, srv
 	if h.Healthy {
 		srv.LastHealthyAt = &checked
 	}
-	return s.UpdateHealth(ctx, srv.ID, h)
+	if err := s.UpdateHealth(ctx, srv.ID, h); err != nil {
+		return err
+	}
+	CheckAgents(ctx, s, c, srv, h.Healthy, resetAgents)
+	return nil
 }

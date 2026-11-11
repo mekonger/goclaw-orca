@@ -300,6 +300,7 @@ func inheritParentPathPolicy(
 	if pt, ok := parentReg.Get("exec"); ok {
 		if parent, ok := pt.(*tools.ExecTool); ok {
 			execTool.InheritSecurityPolicy(parent)
+			execTool.InheritOrcaRouting(parent)
 		}
 	}
 }

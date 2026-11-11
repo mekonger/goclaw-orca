@@ -1,19 +1,21 @@
-import { Pencil, Play, Trash2 } from "lucide-react";
+import { Bot, Pencil, Play, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { formatRelativeTime } from "@/lib/format";
 import type { OrcaServer } from "./hooks/use-orca-servers";
 import { OrcaServerStatusBadge } from "./orca-server-status-badge";
+import { OrcaAgentHealthBadge } from "./orca-agent-health-badge";
 
 interface OrcaServerRowProps {
   server: OrcaServer;
   checking: boolean;
   onCheck: () => void;
   onEdit: () => void;
+  onEditAgents: () => void;
   onDelete: () => void;
 }
 
-export function OrcaServerRow({ server, checking, onCheck, onEdit, onDelete }: OrcaServerRowProps) {
+export function OrcaServerRow({ server, checking, onCheck, onEdit, onEditAgents, onDelete }: OrcaServerRowProps) {
   const { t } = useTranslation("orca-servers");
   const time = (v: string | null) => (v ? formatRelativeTime(v) : t("never"));
 
@@ -28,6 +30,17 @@ export function OrcaServerRow({ server, checking, onCheck, onEdit, onDelete }: O
             <span className="max-w-[220px] text-xs text-muted-foreground">{t("cliMissingHint")}</span>
           )}
         </div>
+      </td>
+      <td className="px-4 py-3">
+        {server.agents?.length ? (
+          <div className="flex max-w-[260px] flex-wrap gap-1">
+            {server.agents.map((a) => (
+              <OrcaAgentHealthBadge key={a.key} label={a.key} health={server.agent_health?.[a.key]} disabled={!a.enabled} />
+            ))}
+          </div>
+        ) : (
+          <span className="block max-w-[200px] text-xs text-muted-foreground">{t("agents.emptyHint")}</span>
+        )}
       </td>
       <td className="px-4 py-3 text-muted-foreground">{server.last_runtime_state || "-"}</td>
       <td className="px-4 py-3 text-muted-foreground">{time(server.last_checked_at)}</td>
@@ -45,6 +58,10 @@ export function OrcaServerRow({ server, checking, onCheck, onEdit, onDelete }: O
         <Button variant="ghost" size="sm" onClick={onCheck} disabled={checking} className="gap-1">
           <Play className="h-3.5 w-3.5" />
           {t("checkNow")}
+        </Button>
+        <Button variant="ghost" size="sm" onClick={onEditAgents} className="gap-1">
+          <Bot className="h-3.5 w-3.5" />
+          {t("actions.agents")}
         </Button>
         <Button variant="ghost" size="sm" onClick={onEdit} className="gap-1">
           <Pencil className="h-3.5 w-3.5" />

@@ -30,7 +30,7 @@ func NewSQLiteOrcaServerStore(db *sql.DB, encryptionKey string) *SQLiteOrcaServe
 }
 
 const orcaServerCols = `id, tenant_id, label, description, pairing_code, last_status, last_runtime_state,
- last_error, last_checked_at, last_healthy_at, created_at, updated_at, created_by`
+ last_error, last_checked_at, last_healthy_at, created_at, updated_at, created_by, agents, agent_health`
 
 func (s *SQLiteOrcaServerStore) encrypt(code string) ([]byte, error) {
 	if s.encKey == "" {
@@ -63,14 +63,18 @@ func (s *SQLiteOrcaServerStore) scan(row orcaRowScanner, withSecret bool) (*stor
 		idStr, tidStr        string
 		checked, healthy     nullSqliteTime
 		createdAt, updatedAt sqliteTime
+		agentsRaw, healthRaw []byte
 	)
 	if err := row.Scan(&idStr, &tidStr, &o.Label, &o.Description, &code, &o.LastStatus, &o.LastRuntimeState,
-		&o.LastError, &checked, &healthy, &createdAt, &updatedAt, &o.CreatedBy); err != nil {
+		&o.LastError, &checked, &healthy, &createdAt, &updatedAt, &o.CreatedBy, &agentsRaw, &healthRaw); err != nil {
 		return nil, err
 	}
 	o.ID, _ = uuid.Parse(idStr)
 	o.TenantID, _ = uuid.Parse(tidStr)
 	o.HasPairingCode = len(code) > 0
+	if err := store.DecodeOrcaAgentColumns(agentsRaw, healthRaw, &o); err != nil {
+		return nil, err
+	}
 	o.CreatedAt, o.UpdatedAt = createdAt.Time, updatedAt.Time
 	if checked.Valid {
 		o.LastCheckedAt = &checked.Time
@@ -170,6 +174,8 @@ func (s *SQLiteOrcaServerStore) Create(ctx context.Context, srv *store.OrcaServe
 	srv.PairingCode = ""
 	srv.HasPairingCode = true
 	srv.LastStatus = store.OrcaServerStatusUnknown
+	srv.Agents = []store.OrcaAgentConfig{}
+	srv.AgentHealth = map[string]store.OrcaAgentHealth{}
 	srv.CreatedAt, srv.UpdatedAt = now, now
 	return nil
 }

@@ -1,0 +1,3 @@
+ALTER TABLE orca_servers
+    ADD COLUMN IF NOT EXISTS agents JSONB NOT NULL DEFAULT '[]'::jsonb,
+    ADD COLUMN IF NOT EXISTS agent_health JSONB NOT NULL DEFAULT '{}'::jsonb;

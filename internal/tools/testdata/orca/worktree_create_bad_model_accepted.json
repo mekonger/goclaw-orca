@@ -1,0 +1,91 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "ok": true,
+  "result": {
+    "worktree": {
+      "id": "00000000-0000-0000-0000-000000000000::/home/user/orca/workspaces/orca-fixture-repo/fx-badmodel",
+      "identity": {
+        "key": "wt2:local:00000000-0000-0000-0000-000000000000",
+        "executionHostId": "local",
+        "instanceId": "00000000-0000-0000-0000-000000000000"
+      },
+      "instanceId": "00000000-0000-0000-0000-000000000000",
+      "repoId": "00000000-0000-0000-0000-000000000000",
+      "projectId": "repo:00000000-0000-0000-0000-000000000000",
+      "hostId": "local",
+      "projectHostSetupId": "00000000-0000-0000-0000-000000000000",
+      "creatorProvenance": {
+        "kind": "host"
+      },
+      "path": "/home/user/orca/workspaces/orca-fixture-repo/fx-badmodel",
+      "head": "1700000000000170000000000017000000000000",
+      "branch": "refs/heads/user/fx-badmodel",
+      "isBare": false,
+      "isMainWorktree": false,
+      "displayName": "fx-badmodel",
+      "displayNameMode": "fixed",
+      "comment": "",
+      "linkedIssue": null,
+      "linkedPR": null,
+      "linkedLinearIssue": null,
+      "linkedLinearIssueWorkspaceId": null,
+      "linkedLinearIssueOrganizationUrlKey": null,
+      "linkedGitLabMR": null,
+      "linkedGitLabIssue": null,
+      "linkedBitbucketPR": null,
+      "linkedAzureDevOpsPR": null,
+      "linkedGiteaPR": null,
+      "linkedWorkItem": null,
+      "linkedTaskSourceContext": null,
+      "isArchived": false,
+      "isUnread": false,
+      "isPinned": false,
+      "sortOrder": 1700000000000,
+      "lastActivityAt": 1700000000000,
+      "createdAt": 1700000000000,
+      "createdWithAgent": "codex",
+      "cliProvenance": {
+        "kind": "created-by-cli",
+        "createdAt": 1700000000000,
+        "startupAgent": "codex"
+      },
+      "baseRef": "main",
+      "workspaceStatus": "in-progress",
+      "parentWorktreeId": null,
+      "childWorktreeIds": [],
+      "lineage": null,
+      "git": {
+        "path": "/home/user/orca/workspaces/orca-fixture-repo/fx-badmodel",
+        "head": "1700000000000170000000000017000000000000",
+        "branch": "refs/heads/user/fx-badmodel",
+        "isBare": false,
+        "isMainWorktree": false
+      },
+      "linkedItems": []
+    },
+    "lineage": null,
+    "workspaceLineage": null,
+    "launch": {
+      "outcome": {
+        "kind": "terminal",
+        "handle": "term_00000000-0000-0000-0000-000000000000",
+        "paneKey": "00000000-0000-0000-0000-000000000000:00000000-0000-0000-0000-000000000000"
+      },
+      "worktreeId": "00000000-0000-0000-0000-000000000000::/home/user/orca/workspaces/orca-fixture-repo/fx-badmodel",
+      "receipt": {
+        "mode": "terminal",
+        "preferred": "terminal",
+        "reason": "user_default",
+        "detail": "Started a terminal agent, the default for new agent tabs in your settings."
+      },
+      "prompt": {
+        "delivery": "submit",
+        "outcome": "handed-to-terminal"
+      },
+      "operationId": "1700000000000-17000000000001700000000000000000"
+    }
+  },
+  "_meta": {
+    "runtimeId": "00000000-0000-0000-0000-000000000000"
+  }
+}
