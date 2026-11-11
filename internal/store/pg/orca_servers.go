@@ -26,7 +26,7 @@ func NewPGOrcaServerStore(db *sql.DB, encryptionKey string) *PGOrcaServerStore {
 }
 
 const orcaServerCols = `id, tenant_id, label, description, pairing_code, last_status, last_runtime_state,
- last_error, last_checked_at, last_healthy_at, created_at, updated_at, created_by`
+ last_error, last_checked_at, last_healthy_at, created_at, updated_at, created_by, agents, agent_health`
 
 func (s *PGOrcaServerStore) encrypt(code string) ([]byte, error) {
 	if s.encKey == "" {
@@ -58,12 +58,17 @@ func (s *PGOrcaServerStore) scan(row orcaRowScanner, withSecret bool) (*store.Or
 		code    []byte
 		checked sql.NullTime
 		healthy sql.NullTime
+
+		agentsRaw, healthRaw []byte
 	)
 	if err := row.Scan(&o.ID, &o.TenantID, &o.Label, &o.Description, &code, &o.LastStatus, &o.LastRuntimeState,
-		&o.LastError, &checked, &healthy, &o.CreatedAt, &o.UpdatedAt, &o.CreatedBy); err != nil {
+		&o.LastError, &checked, &healthy, &o.CreatedAt, &o.UpdatedAt, &o.CreatedBy, &agentsRaw, &healthRaw); err != nil {
 		return nil, nil, err
 	}
 	o.HasPairingCode = len(code) > 0
+	if err := store.DecodeOrcaAgentColumns(agentsRaw, healthRaw, &o); err != nil {
+		return nil, nil, err
+	}
 	if checked.Valid {
 		o.LastCheckedAt = &checked.Time
 	}
@@ -160,6 +165,8 @@ func (s *PGOrcaServerStore) Create(ctx context.Context, srv *store.OrcaServer) e
 	srv.PairingCode = ""
 	srv.HasPairingCode = true
 	srv.LastStatus = store.OrcaServerStatusUnknown
+	srv.Agents = []store.OrcaAgentConfig{}
+	srv.AgentHealth = map[string]store.OrcaAgentHealth{}
 	srv.CreatedAt, srv.UpdatedAt = now, now
 	return nil
 }

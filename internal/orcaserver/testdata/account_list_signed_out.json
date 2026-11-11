@@ -1,0 +1,68 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "ok": true,
+  "result": {
+    "opencode": {
+      "accounts": [],
+      "activeAccountId": null
+    },
+    "devin": {
+      "accounts": [],
+      "activeAccountId": null
+    },
+    "claude": {
+      "accounts": [],
+      "activeAccountId": null,
+      "activeAccountIdsByRuntime": {
+        "host": null,
+        "wsl": {}
+      }
+    },
+    "codex": {
+      "accounts": [],
+      "activeAccountId": null,
+      "activeAccountIdsByRuntime": {
+        "host": null,
+        "wsl": {}
+      },
+      "systemDefault": {
+        "hasAuth": false,
+        "authKind": "none",
+        "email": null,
+        "providerAccountId": null,
+        "workspaceLabel": null
+      }
+    },
+    "rateLimits": {
+      "claude": null,
+      "codex": null,
+      "gemini": null,
+      "opencodeGo": null,
+      "kimi": null,
+      "antigravity": null,
+      "minimax": null,
+      "grok": null,
+      "cursor": null,
+      "zcode": null,
+      "minimaxCookieConfigured": false,
+      "minimaxApiKeyConfigured": false,
+      "zcodePlanApiKeyConfigured": false,
+      "opencodeGoApiKeyConfigured": false,
+      "grokAuthConfigured": false,
+      "cursorAuthConfigured": false,
+      "claudeTarget": {
+        "runtime": "host",
+        "wslDistro": null
+      },
+      "codexTarget": {
+        "runtime": "host",
+        "wslDistro": null
+      },
+      "inactiveClaudeAccounts": [],
+      "inactiveCodexAccounts": []
+    }
+  },
+  "_meta": {
+    "runtimeId": "00000000-0000-0000-0000-000000000000"
+  }
+}

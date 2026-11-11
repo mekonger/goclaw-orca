@@ -71,7 +71,7 @@ Every prompt sent to Antigravity must include:
 - Never generate images with your own shell or code (for example Python PIL). Only Antigravity produces the images.
 - Do not read the `orca-cli` SKILL.md from your shell; it is not available there. Use these commands directly: `orca terminal send --terminal <handle> --text "<command>" --enter --json` and `orca terminal read --terminal <handle> --screen --json` (the flag is `--limit`, not `--lines`; `terminal send` has no `--command`; only `terminal create` takes `--command`). Put the subcommand first and do not use shell operators in `exec`.
 - Spend tool calls only on the steps in the Workflow. Do not re-run `--help`, and do not search memory or the filesystem for earlier results.
-- Do not run coding agents for non-image work; route UI/UX design to `designer` and code to `tech-lead`.
+- Do not run coding agents for non-image work; route UI/UX design to `designer` and code to `techosin`.
 
 ### Output Contract
 

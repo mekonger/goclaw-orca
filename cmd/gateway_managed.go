@@ -111,6 +111,7 @@ func wireExtras(
 		if execTool, ok := toolsReg.Get("exec"); ok {
 			if et, ok := execTool.(*tools.ExecTool); ok {
 				et.SetSecureCLIStore(stores.SecureCLI)
+				et.SetOrcaRouting(stores.OrcaServers, stores.Providers)
 			}
 		}
 	}

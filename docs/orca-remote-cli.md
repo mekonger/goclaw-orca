@@ -91,6 +91,49 @@ and are not copied automatically. To move a machine: add it on the Orca Servers 
 same label and pairing URL, confirm it is `healthy`, then delete the labeled credential from
 CLI Credentials so the server takes over.
 
+### Coding agents and `--agent auto`
+
+Each Orca server has an ordered list of coding agents (Orca Servers page → **Agents**), up to 10:
+
+| Field | Rule |
+|-------|------|
+| Key | Unique per server, `^[a-z0-9][a-z0-9._-]{0,63}$` |
+| Agent | Orca agent id (`claude`, `codex`, …), same pattern as key |
+| Model | Optional, `^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$` (e.g. `openai/gpt-5`) |
+| Tier | `routine`, `hard`, or `planning` (at most one planning entry) |
+| Description | Up to 300 characters; the router reads it to pick an agent |
+| Enabled / Fallback | At most one fallback; it must be enabled and not `planning` |
+
+Agents run `orca --server <label> worktree create|agent launch ... --agent auto`. Before the
+deny checks the gateway rewrites `--agent auto` to `--agent <id> [--model <id>]` and prepends
+`routed: --agent <id> --model <id> (<reason>)` to the output:
+
+1. Prompt starts with `/planning` → the planning entry.
+2. Prompt starts with `/cook` → first enabled `hard` entry that is `healthy`, else one that is `unknown`, else the fallback.
+3. Otherwise candidates are enabled, not `unhealthy`, tier `routine` or `hard`. One candidate → it. If the tenant has an enabled LLM provider named `jev-*`, Jev (OpenRouter `systemone`) picks from the descriptions; confidence below the provider's `settings.threshold` (default 0.6) → fallback. No Jev → fallback.
+
+`--agent auto` is refused, and orca is never run, when the command is not against an Orca
+server (`--server <label>`), when `--model`/`--effort` is also passed, when a flag is repeated,
+or when the server has no usable agent. An explicitly named agent always runs; if it is not
+configured on the server a `warning:` line is prepended.
+
+Jev provider: create an LLM provider whose name starts with `jev-` with the OpenRouter key.
+Optional `settings`: `{"model": "typesafe/jev-1.13", "threshold": 0.6}`. `api_base` defaults
+to `https://openrouter.ai/api/v1`. Routing decisions are logged as `orca.route`.
+
+**Agent health** (badges on the page):
+
+| Source | Effect |
+|--------|--------|
+| Launch reply `invalid_argument` `Unknown TUI agent "<id>"` | That entry → `unhealthy` |
+| `orca account list --json` (every 5 min and on Check) | Signed in → `healthy`; `systemDefault.hasAuth: false` with no accounts → `unhealthy: not signed in`; no auth data (e.g. claude) → unchanged |
+| Server not healthy | All entries → `unknown` |
+| Check button | `unhealthy` → `unknown` first |
+| Background refresh | `unhealthy` older than 30 minutes → `unknown` |
+
+A successful launch reply does not mark an agent healthy: Orca 1.4.243 also returns
+`ok: true` for signed-out agents and unknown models, which then fail inside the session.
+
 ### Multiple Orca machines (labeled credentials)
 
 Use one credential per machine. In the CLI Credentials dialog (agent or user credential),

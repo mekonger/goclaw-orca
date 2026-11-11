@@ -15,7 +15,8 @@
     "lastChecked": "Проверен",
     "lastHealthy": "Был здоров",
     "lastError": "Последняя ошибка",
-    "actions": "Действия"
+    "actions": "Действия",
+    "agents": "Агенты"
   },
   "status": {
     "unknown": "Неизвестно",
@@ -26,7 +27,8 @@
   },
   "actions": {
     "edit": "Изменить",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "agents": "Агенты"
   },
   "emptyTitle": "Нет серверов Orca",
   "emptyDescription": "Запустите orca serve на машине, скопируйте Pairing URL (orca://...) и добавьте сюда с меткой.",
@@ -65,6 +67,52 @@
     "checkedAll": "Все серверы проверены",
     "saveFailed": "Не удалось сохранить",
     "deleteFailed": "Не удалось удалить",
-    "checkFailed": "Не удалось проверить"
+    "checkFailed": "Не удалось проверить",
+    "agentsSaved": "Агенты сохранены"
+  },
+  "agentStatus": {
+    "unknown": "Неизвестно",
+    "healthy": "Исправен",
+    "unhealthy": "Неисправен"
+  },
+  "agents": {
+    "title": "Агенты на {{label}}",
+    "description": "Агенты, которых `orca ... --agent auto` может выбрать на этом сервере, по приоритету. Состояние берётся из проверки входа и ошибок запуска.",
+    "emptyHint": "Не настроено: --agent auto отклоняется, пока агенты не настроены.",
+    "newRow": "новый агент",
+    "moveUp": "Вверх",
+    "moveDown": "Вниз",
+    "remove": "Удалить",
+    "add": "Добавить агента",
+    "lastOk": "последний успех {{time}}",
+    "disabled": "отключён",
+    "fields": {
+      "key": "Ключ",
+      "agent": "Агент",
+      "agentPlaceholder": "id агента (claude, codex…)",
+      "model": "Модель",
+      "modelPlaceholder": "Модель (необязательно)",
+      "tier": "Уровень",
+      "description": "Описание",
+      "descriptionPlaceholder": "Когда выбирать этого агента (для маршрутизатора)",
+      "enabled": "Включён",
+      "fallback": "Резервный"
+    },
+    "tiers": {
+      "routine": "Routine",
+      "hard": "Hard",
+      "planning": "Planning (только /planning)"
+    },
+    "errors": {
+      "row": "Агент {{row}}: {{message}}",
+      "tooMany": "Не более {{max}} агентов",
+      "keyInvalid": "ключ: 1-64 строчные буквы, цифры, '.', '_' или '-'",
+      "agentInvalid": "id агента: 1-64 строчные буквы, цифры, '.', '_' или '-'",
+      "modelInvalid": "модель может содержать буквы, цифры и . _ : / - и не начинаться с -",
+      "duplicateKey": "ключ уже используется",
+      "fallbackRule": "Допускается один резервный агент; он должен быть включён и не Planning",
+      "planningLimit": "Допускается только один агент Planning",
+      "descriptionTooLong": "описание не длиннее {{maxLen}} символов"
+    }
   }
 }

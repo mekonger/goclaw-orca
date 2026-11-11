@@ -35,6 +35,7 @@ func (h *OrcaServersHandler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /v1/orca-servers/{id}", h.auth(h.handleUpdate))
 	mux.HandleFunc("DELETE /v1/orca-servers/{id}", h.auth(h.handleDelete))
 	mux.HandleFunc("POST /v1/orca-servers/{id}/check", h.auth(h.handleCheck))
+	mux.HandleFunc("PUT /v1/orca-servers/{id}/agents", h.auth(h.handleUpdateAgents))
 }
 
 func (h *OrcaServersHandler) auth(next http.HandlerFunc) http.HandlerFunc {

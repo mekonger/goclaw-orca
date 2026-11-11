@@ -4,10 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"os"
-	"os/exec"
 	"strings"
 	"time"
 	"unicode"
@@ -58,38 +55,24 @@ type statusOutput struct {
 
 func (c *Checker) Check(ctx context.Context, code string) store.OrcaServerHealth {
 	h := store.OrcaServerHealth{CheckedAt: time.Now().UTC()}
-	path, err := exec.LookPath("orca")
+	res, err := c.run(ctx, code, "status", "--json")
 	if err != nil {
 		h.Status = store.OrcaServerStatusCLIMissing
-		h.Error = "orca CLI not found on gateway PATH"
+		h.Error = err.Error()
 		return h
 	}
-	timeout := c.Timeout
-	if timeout <= 0 {
-		timeout = DefaultCheckTimeout
-	}
-	cctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	cmd := exec.CommandContext(cctx, path, "status", "--json")
-	cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + os.Getenv("HOME"), pairingEnv + "=" + code}
-	cmd.WaitDelay = 2 * time.Second
-	var stdout, stderr cappedBuffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	runErr := cmd.Run()
 
 	var out statusOutput
-	parseErr := json.Unmarshal(stdout.buf.Bytes(), &out)
+	parseErr := json.Unmarshal(res.stdout, &out)
 	state := out.Result.Runtime.State
 	if state == "" {
 		state = out.Runtime.State
 	}
 
 	switch {
-	case errors.Is(cctx.Err(), context.DeadlineExceeded):
+	case res.timedOut:
 		h.Status = store.OrcaServerStatusError
-		h.Error = fmt.Sprintf("orca status timed out after %s", timeout)
+		h.Error = fmt.Sprintf("orca status timed out after %s", c.timeout())
 	case parseErr == nil && state == stateReady:
 		h.Status = store.OrcaServerStatusHealthy
 		h.RuntimeState = state
@@ -97,14 +80,14 @@ func (c *Checker) Check(ctx context.Context, code string) store.OrcaServerHealth
 	case parseErr == nil && state != "":
 		h.Status = store.OrcaServerStatusUnhealthy
 		h.RuntimeState = state
-		h.Error = sanitize(firstNonEmpty(out.Error.Message, stderr.buf.String(), "runtime state is "+state), code)
+		h.Error = sanitize(firstNonEmpty(out.Error.Message, res.stderr, "runtime state is "+state), code)
 	default:
 		h.Status = store.OrcaServerStatusError
 		msg := out.Error.Message
 		if parseErr != nil {
-			msg = firstNonEmpty(stderr.buf.String(), errText(runErr), "unparseable orca status output")
+			msg = firstNonEmpty(res.stderr, errText(res.runErr), "unparseable orca status output")
 		}
-		h.Error = sanitize(firstNonEmpty(msg, stderr.buf.String(), errText(runErr), "orca status returned no runtime state"), code)
+		h.Error = sanitize(firstNonEmpty(msg, res.stderr, errText(res.runErr), "orca status returned no runtime state"), code)
 	}
 	return h
 }

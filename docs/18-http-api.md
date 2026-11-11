@@ -1430,12 +1430,15 @@ binary at the lowest precedence. Tenant owner or admin only. See the
 | `GET` | `/v1/orca-servers/{id}` | Get one |
 | `PUT` | `/v1/orca-servers/{id}` | Update `description` and/or `pairing_code` |
 | `DELETE` | `/v1/orca-servers/{id}` | Delete (`204`) |
-| `POST` | `/v1/orca-servers/{id}/check` | Run `orca status --json` now and return the updated row |
+| `POST` | `/v1/orca-servers/{id}/check` | Run `orca status --json` and `orca account list --json` now, reset `unhealthy` agents, and return the updated row |
+| `PUT` | `/v1/orca-servers/{id}/agents` | Replace the coding-agent list (`{"agents": [...]}`); drops health for removed keys and for entries whose agent or model changed |
 
 Responses carry `id`, `label`, `description`, `has_pairing_code`, `last_status`
 (`unknown|healthy|unhealthy|error|cli_missing`), `last_runtime_state`, `last_error`,
-`last_checked_at`, `last_healthy_at`, `created_at`, `updated_at`, `created_by`. The pairing code is
-never returned.
+`last_checked_at`, `last_healthy_at`, `created_at`, `updated_at`, `created_by`, `agents`
+(`[{key, agent, model?, tier, description, enabled, fallback?}]`, never null) and `agent_health`
+(`{key: {status: unknown|healthy|unhealthy, error?, checked_at, last_ok_at?}}`, never null). The
+pairing code is never returned.
 
 | Status | When |
 |--------|------|

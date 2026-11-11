@@ -56,6 +56,8 @@ type ExecTool struct {
 	approvalMgr             *ExecApprovalManager // nil = no approval needed
 	agentID                 string               // for approval request context
 	secureCLIStore          store.SecureCLIStore // nil = no credentialed exec
+	orcaServers             store.OrcaServerStore
+	orcaProviders           orcaProviderLister
 	policyMu                sync.RWMutex
 	commandKeywordAllowlist []config.CommandKeywordAllowlistRule
 	// globalDenyGroups holds global shell deny-group toggles from config.tools.

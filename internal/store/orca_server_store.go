@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -43,6 +44,9 @@ type OrcaServer struct {
 	CreatedAt        time.Time  `json:"created_at"`
 	UpdatedAt        time.Time  `json:"updated_at"`
 	CreatedBy        string     `json:"created_by"`
+
+	Agents      []OrcaAgentConfig          `json:"agents"`
+	AgentHealth map[string]OrcaAgentHealth `json:"agent_health"`
 }
 
 type OrcaServerHealth struct {
@@ -62,6 +66,30 @@ type OrcaServerStore interface {
 	Delete(ctx context.Context, id uuid.UUID) error
 	UpdateHealth(ctx context.Context, id uuid.UUID, h OrcaServerHealth) error
 	ListDueForCheck(ctx context.Context, olderThan time.Time, limit int) ([]OrcaServer, error)
+	UpdateAgents(ctx context.Context, id uuid.UUID, agents []OrcaAgentConfig) error
+	UpdateAgentHealth(ctx context.Context, id uuid.UUID, a OrcaAgentConfig, h OrcaAgentHealth) error
+}
+
+func DecodeOrcaAgentColumns(agentsRaw, healthRaw []byte, srv *OrcaServer) error {
+	srv.Agents = []OrcaAgentConfig{}
+	srv.AgentHealth = map[string]OrcaAgentHealth{}
+	if len(agentsRaw) > 0 {
+		if err := json.Unmarshal(agentsRaw, &srv.Agents); err != nil {
+			return fmt.Errorf("decode orca agents: %w", err)
+		}
+	}
+	if len(healthRaw) > 0 {
+		if err := json.Unmarshal(healthRaw, &srv.AgentHealth); err != nil {
+			return fmt.Errorf("decode orca agent health: %w", err)
+		}
+	}
+	if srv.Agents == nil {
+		srv.Agents = []OrcaAgentConfig{}
+	}
+	if srv.AgentHealth == nil {
+		srv.AgentHealth = map[string]OrcaAgentHealth{}
+	}
+	return nil
 }
 
 func ValidateOrcaPairingCode(s string) error {

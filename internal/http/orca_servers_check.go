@@ -18,7 +18,7 @@ func (h *OrcaServersHandler) handleCheck(w http.ResponseWriter, r *http.Request)
 		h.writeStoreError(w, r, err, id.String())
 		return
 	}
-	if err := orcaserver.CheckAndStore(ctx, h.servers, h.checker, srv); err != nil {
+	if err := orcaserver.CheckAndStore(ctx, h.servers, h.checker, srv, true); err != nil {
 		h.writeStoreError(w, r, err, id.String())
 		return
 	}

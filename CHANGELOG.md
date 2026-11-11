@@ -19,6 +19,14 @@ All notable changes to GoClaw are documented here. For full documentation, see [
 
 ### Added
 
+- **Orca coding-agent routing (`--agent auto`)** — each Orca server stores an ordered list of
+  coding agents (agent, model, tier `routine|hard|planning`, description, enabled, one fallback),
+  edited on the Orca Servers page or with `PUT /v1/orca-servers/{id}/agents`. `orca --server <label>
+  worktree create|agent launch --agent auto` is rewritten by the gateway: `/planning` → planning
+  entry, `/cook` → hard entry, otherwise Jev picks when the tenant has an enabled `jev-*` provider,
+  else the fallback. Unroutable `auto` is refused. Per-agent health comes from `orca account list`
+  and from "Unknown TUI agent" launch errors. Schema: PostgreSQL migration `000102`, SQLite schema 63.
+
 - **Labeled Secure CLI credentials (multiple servers)** — a binary can hold one credential per
   machine, each with a `label` (lowercase `[a-z0-9_-]`, max 32, `default` reserved) and a
   `description` (max 200). Agents pick a machine with `orca --server <label> <subcommand> --json`;
