@@ -10,6 +10,7 @@
   },
   "nav": {
     "agentTeams": "Agent Link & Team",
+    "companySimulator": "公司模拟器",
     "agents": "Agent",
     "approvals": "审批",
     "importExport": "Import & Export",

@@ -1,0 +1,31 @@
+{
+  "title": "Company Simulator",
+  "description": "Watch an agent team at work in a 3D office.",
+  "selectTeam": "Select team",
+  "empty": {
+    "noTeams": "No agent team yet",
+    "noTeamsDescription": "Create a team to open its office.",
+    "goToTeams": "Go to Teams",
+    "noMembers": "This team has no members."
+  },
+  "status": {
+    "working": "Working",
+    "sleeping": "Sleeping"
+  },
+  "delegation": {
+    "to": "Delegated to {{name}}",
+    "from": "Working for {{name}}"
+  },
+  "panel": {
+    "title": "Employees",
+    "noActivity": "No activity yet.",
+    "back": "All employees"
+  },
+  "run": {
+    "started": "Run started",
+    "completed": "Run completed",
+    "failed": "Run failed",
+    "cancelled": "Run cancelled"
+  },
+  "webglUnsupported": "3D view is not available in this browser. Use the employee list instead."
+}

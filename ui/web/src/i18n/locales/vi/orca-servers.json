@@ -15,7 +15,8 @@
     "lastChecked": "Kiểm tra gần nhất",
     "lastHealthy": "Khỏe gần nhất",
     "lastError": "Lỗi gần nhất",
-    "actions": "Thao tác"
+    "actions": "Thao tác",
+    "agents": "Coding agent"
   },
   "status": {
     "unknown": "Chưa rõ",
@@ -26,7 +27,8 @@
   },
   "actions": {
     "edit": "Sửa",
-    "delete": "Xóa"
+    "delete": "Xóa",
+    "agents": "Agent"
   },
   "emptyTitle": "Chưa có máy chủ Orca",
   "emptyDescription": "Chạy orca serve trên một máy, sao chép Pairing URL (orca://...), rồi thêm vào đây kèm một nhãn.",
@@ -65,6 +67,52 @@
     "checkedAll": "Đã kiểm tra tất cả",
     "saveFailed": "Lưu thất bại",
     "deleteFailed": "Xóa thất bại",
-    "checkFailed": "Kiểm tra thất bại"
+    "checkFailed": "Kiểm tra thất bại",
+    "agentsSaved": "Đã lưu coding agent"
+  },
+  "agentStatus": {
+    "unknown": "Chưa rõ",
+    "healthy": "Ổn định",
+    "unhealthy": "Lỗi"
+  },
+  "agents": {
+    "title": "Coding agent trên {{label}}",
+    "description": "Các agent mà `orca ... --agent auto` có thể chọn trên server này, theo thứ tự ưu tiên. Trạng thái lấy từ kiểm tra đăng nhập và lỗi khi khởi chạy.",
+    "emptyHint": "Chưa cấu hình: --agent auto sẽ bị từ chối cho đến khi có agent.",
+    "newRow": "agent mới",
+    "moveUp": "Lên",
+    "moveDown": "Xuống",
+    "remove": "Xoá",
+    "add": "Thêm agent",
+    "lastOk": "OK lần cuối {{time}}",
+    "disabled": "đã tắt",
+    "fields": {
+      "key": "Khóa",
+      "agent": "Agent",
+      "agentPlaceholder": "Mã agent (claude, codex…)",
+      "model": "Model",
+      "modelPlaceholder": "Model (tuỳ chọn)",
+      "tier": "Tier",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Khi nào nên chọn agent này (router dùng)",
+      "enabled": "Bật",
+      "fallback": "Dự phòng"
+    },
+    "tiers": {
+      "routine": "Routine",
+      "hard": "Hard",
+      "planning": "Planning (chỉ /planning)"
+    },
+    "errors": {
+      "row": "Agent {{row}}: {{message}}",
+      "tooMany": "Tối đa {{max}} agent",
+      "keyInvalid": "khóa phải gồm 1-64 chữ thường, số, '.', '_' hoặc '-'",
+      "agentInvalid": "mã agent phải gồm 1-64 chữ thường, số, '.', '_' hoặc '-'",
+      "modelInvalid": "model chỉ dùng chữ, số và . _ : / - và không bắt đầu bằng -",
+      "duplicateKey": "khóa đã được dùng",
+      "fallbackRule": "Chỉ một agent dự phòng, phải được bật và không thuộc Planning",
+      "planningLimit": "Chỉ được một agent Planning",
+      "descriptionTooLong": "mô tả tối đa {{maxLen}} ký tự"
+    }
   }
 }

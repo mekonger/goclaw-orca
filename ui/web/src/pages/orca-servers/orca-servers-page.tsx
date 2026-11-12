@@ -11,11 +11,12 @@ import { useDeferredLoading } from "@/hooks/use-deferred-loading";
 import { useOrcaServers, type OrcaServer } from "./hooks/use-orca-servers";
 import { OrcaServerFormDialog } from "./orca-server-form-dialog";
 import { OrcaServerRow } from "./orca-server-row";
+import { OrcaServerAgentsEditor } from "./orca-server-agents-editor";
 import { buildOrcaServerCreatePayload, buildOrcaServerUpdatePayload } from "./orca-server-form-helpers";
 
 export function OrcaServersPage() {
   const { t } = useTranslation("orca-servers");
-  const { servers, loading, createServer, updateServer, deleteServer, checkServer, checkAll } = useOrcaServers();
+  const { servers, loading, createServer, updateServer, updateAgents, deleteServer, checkServer, checkAll } = useOrcaServers();
 
   const isEmpty = servers.length === 0;
   const showSkeleton = useDeferredLoading(loading && isEmpty);
@@ -23,6 +24,7 @@ export function OrcaServersPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<OrcaServer | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<OrcaServer | null>(null);
+  const [agentsTarget, setAgentsTarget] = useState<OrcaServer | null>(null);
   const [checkingIds, setCheckingIds] = useState<Set<string>>(new Set());
   const [checkingAll, setCheckingAll] = useState(false);
   const checkAllSpinning = useMinLoading(checkingAll);
@@ -59,7 +61,7 @@ export function OrcaServersPage() {
     }
   }
 
-  const headers = ["label", "description", "status", "runtime", "lastChecked", "lastHealthy", "lastError"] as const;
+  const headers = ["label", "description", "status", "agents", "runtime", "lastChecked", "lastHealthy", "lastError"] as const;
 
   return (
     <div className="p-4 sm:p-6 pb-10">
@@ -112,6 +114,7 @@ export function OrcaServersPage() {
                     checking={checkingIds.has(server.id) || checkingAll}
                     onCheck={() => runCheck(server.id)}
                     onEdit={() => openEdit(server)}
+                    onEditAgents={() => setAgentsTarget(server)}
                     onDelete={() => setDeleteTarget(server)}
                   />
                 ))}
@@ -134,6 +137,15 @@ export function OrcaServersPage() {
               await createServer(buildOrcaServerCreatePayload(form));
             }
           }}
+        />
+      )}
+
+      {agentsTarget && (
+        <OrcaServerAgentsEditor
+          key={agentsTarget.id}
+          server={agentsTarget}
+          onOpenChange={(v) => { if (!v) setAgentsTarget(null); }}
+          onSave={(agents) => updateAgents(agentsTarget.id, agents)}
         />
       )}
 

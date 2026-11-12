@@ -127,3 +127,37 @@ func (m *memOrcaStore) UpdateHealth(_ context.Context, id uuid.UUID, h store.Orc
 func (m *memOrcaStore) ListDueForCheck(context.Context, time.Time, int) ([]store.OrcaServer, error) {
 	return nil, nil
 }
+
+func (m *memOrcaStore) UpdateAgents(ctx context.Context, id uuid.UUID, agents []store.OrcaAgentConfig) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	r, err := m.find(ctx, id)
+	if err != nil {
+		return err
+	}
+	if err := store.ValidateOrcaAgents(agents); err != nil {
+		return err
+	}
+	r.AgentHealth = store.PruneOrcaAgentHealth(r.Agents, agents, r.AgentHealth)
+	r.Agents = append([]store.OrcaAgentConfig{}, agents...)
+	return nil
+}
+
+func (m *memOrcaStore) UpdateAgentHealth(ctx context.Context, id uuid.UUID, cfg store.OrcaAgentConfig, h store.OrcaAgentHealth) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	r, err := m.find(ctx, id)
+	if err != nil {
+		return err
+	}
+	for _, a := range r.Agents {
+		if a.Key == cfg.Key && a.Agent == cfg.Agent && a.Model == cfg.Model {
+			if r.AgentHealth == nil {
+				r.AgentHealth = map[string]store.OrcaAgentHealth{}
+			}
+			r.AgentHealth[a.Key] = h
+			return nil
+		}
+	}
+	return store.ErrOrcaServerNotFound
+}

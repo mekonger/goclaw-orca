@@ -1,0 +1,31 @@
+{
+  "title": "회사 시뮬레이터",
+  "description": "3D 사무실에서 에이전트 팀이 일하는 모습을 확인하세요.",
+  "selectTeam": "팀 선택",
+  "empty": {
+    "noTeams": "에이전트 팀이 없습니다",
+    "noTeamsDescription": "팀을 만들면 사무실이 열립니다.",
+    "goToTeams": "팀으로 이동",
+    "noMembers": "이 팀에는 멤버가 없습니다."
+  },
+  "status": {
+    "working": "작업 중",
+    "sleeping": "수면 중"
+  },
+  "delegation": {
+    "to": "{{name}}에게 위임함",
+    "from": "{{name}}의 작업 수행 중"
+  },
+  "panel": {
+    "title": "직원",
+    "noActivity": "아직 활동이 없습니다.",
+    "back": "전체 직원"
+  },
+  "run": {
+    "started": "실행 시작",
+    "completed": "실행 완료",
+    "failed": "실행 실패",
+    "cancelled": "실행 취소됨"
+  },
+  "webglUnsupported": "이 브라우저에서는 3D 보기를 사용할 수 없습니다. 직원 목록을 이용하세요."
+}

@@ -24,7 +24,7 @@ Most failed workflows start with a task that answers the wrong question, so sett
 |---|---|
 | `business-research` | Market, competitor and customer research; finding existing information, images and screenshots on the web |
 | `product-manager` | Requirements, scope, prioritization |
-| `tech-lead` | Anything about code, repos, Orca, deployments or technical status. It routes work to `technical-architect`, `software-engineer` and `tech-expert`; only `software-engineer` runs Orca. Never assign those three directly |
+| `techosin` | Anything about code, repos, Orca, solution design, troubleshooting, deployments or technical status. It is the whole engineering team and does the work itself through Orca. `tech-lead`, `technical-architect`, `software-engineer`, `devops-engineer` and `tech-expert` are retired; never assign them |
 | `designer` | UI/UX design, mockups, design artifacts, and new images (it works with an image agent of its own) |
 | `qa-reviewer` | Independent verification against acceptance criteria |
 | `growth-sales` | Positioning, messaging, campaigns, growth experiments |
@@ -64,6 +64,7 @@ The assignee starts a fresh session and sees only `subject` and `description`, n
 - When a task completes, read the deliverable with `team_tasks(action="get", task_id=...)` and open the attached files with `list_files` and `read_file`. A completion message is a claim, not evidence.
 - If the deliverable misses its acceptance criteria, add the missing context with `team_tasks(action="update", task_id=..., description=...)`, then `team_tasks(action="retry", task_id=...)`. `update` accepts only `description`, `subject` and `blocked_by`. `retry` works only on stale, failed, cancelled or in-review tasks.
 - A blocker comment means the member needs input. Supply it and retry, or ask the founder.
+- A `techosin` result that starts with `Partial:` means a coding agent is still working in Orca. Create a follow-up `techosin` task that names the worktree id and what remains, so it resumes the same worktree. Do not report the work as done.
 - Send files with `send_file`, using a full path you have confirmed with `list_files`.
 
 ### 5. Report to the founder

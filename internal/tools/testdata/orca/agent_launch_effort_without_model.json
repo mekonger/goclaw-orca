@@ -1,0 +1,11 @@
+{
+  "id": "local",
+  "ok": false,
+  "error": {
+    "code": "invalid_argument",
+    "message": "--effort requires --model."
+  },
+  "_meta": {
+    "runtimeId": null
+  }
+}

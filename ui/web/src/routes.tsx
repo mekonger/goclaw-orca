@@ -117,6 +117,9 @@ const HooksPage = lazyWithRetry(() =>
 const WebhooksPage = lazyWithRetry(() =>
   import("@/pages/webhooks/webhooks-page").then((m) => ({ default: m.WebhooksPage })),
 );
+const CompanySimulatorPage = lazyWithRetry(() =>
+  import("@/pages/company-simulator/company-simulator-page").then((m) => ({ default: m.CompanySimulatorPage })),
+);
 const OrcaServersPage = lazyWithRetry(() =>
   import("@/pages/orca-servers/orca-servers-page").then((m) => ({ default: m.OrcaServersPage })),
 );
@@ -174,6 +177,7 @@ export function AppRoutes() {
           <Route path={ROUTES.AGENT_CODEX_POOL} element={<RequireAdmin><AgentCodexPoolPage /></RequireAdmin>} />
           <Route path={ROUTES.AGENT_DETAIL} element={<AgentsPage key="detail" />} />
           <Route path={ROUTES.TEAMS} element={<TeamsPage key="list" />} />
+          <Route path={ROUTES.COMPANY_SIMULATOR} element={<CompanySimulatorPage />} />
           <Route path={ROUTES.TEAM_DETAIL} element={<TeamsPage key="detail" />} />
           <Route path={ROUTES.SESSIONS} element={<SessionsPage key="list" />} />
           <Route path={ROUTES.SESSION_DETAIL} element={<SessionsPage key="detail" />} />

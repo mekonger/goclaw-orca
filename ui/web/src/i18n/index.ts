@@ -35,6 +35,7 @@ import enActivity from "./locales/en/activity.json";
 import enApiKeys from "./locales/en/api-keys.json";
 import enCliCredentials from "./locales/en/cli-credentials.json";
 import enOrcaServers from "./locales/en/orca-servers.json";
+import enCompanySimulator from "./locales/en/company-simulator.json";
 import enPackages from "./locales/en/packages.json";
 import enTenants from "./locales/en/tenants.json";
 import enSystemSettings from "./locales/en/system-settings.json";
@@ -79,6 +80,7 @@ import viActivity from "./locales/vi/activity.json";
 import viApiKeys from "./locales/vi/api-keys.json";
 import viCliCredentials from "./locales/vi/cli-credentials.json";
 import viOrcaServers from "./locales/vi/orca-servers.json";
+import viCompanySimulator from "./locales/vi/company-simulator.json";
 import viPackages from "./locales/vi/packages.json";
 import viTenants from "./locales/vi/tenants.json";
 import viSystemSettings from "./locales/vi/system-settings.json";
@@ -123,6 +125,7 @@ import koActivity from "./locales/ko/activity.json";
 import koApiKeys from "./locales/ko/api-keys.json";
 import koCliCredentials from "./locales/ko/cli-credentials.json";
 import koOrcaServers from "./locales/ko/orca-servers.json";
+import koCompanySimulator from "./locales/ko/company-simulator.json";
 import koPackages from "./locales/ko/packages.json";
 import koTenants from "./locales/ko/tenants.json";
 import koSystemSettings from "./locales/ko/system-settings.json";
@@ -164,6 +167,7 @@ import zhActivity from "./locales/zh/activity.json";
 import zhApiKeys from "./locales/zh/api-keys.json";
 import zhCliCredentials from "./locales/zh/cli-credentials.json";
 import zhOrcaServers from "./locales/zh/orca-servers.json";
+import zhCompanySimulator from "./locales/zh/company-simulator.json";
 import zhPackages from "./locales/zh/packages.json";
 import zhTenants from "./locales/zh/tenants.json";
 import zhSystemSettings from "./locales/zh/system-settings.json";
@@ -208,6 +212,7 @@ import ruActivity from "./locales/ru/activity.json";
 import ruApiKeys from "./locales/ru/api-keys.json";
 import ruCliCredentials from "./locales/ru/cli-credentials.json";
 import ruOrcaServers from "./locales/ru/orca-servers.json";
+import ruCompanySimulator from "./locales/ru/company-simulator.json";
 import ruPackages from "./locales/ru/packages.json";
 import ruTenants from "./locales/ru/tenants.json";
 import ruSystemSettings from "./locales/ru/system-settings.json";
@@ -244,6 +249,7 @@ const ns = [
   "webhooks",
   "workstations",
   "orca-servers",
+  "company-simulator",
 ] as const;
 
 i18n.use(initReactI18next).init({
@@ -269,6 +275,7 @@ i18n.use(initReactI18next).init({
       webhooks: enWebhooks,
       workstations: enWorkstations,
       "orca-servers": enOrcaServers,
+      "company-simulator": enCompanySimulator,
     },
     vi: {
       common: viCommon, sidebar: viSidebar, topbar: viTopbar, login: viLogin,
@@ -291,6 +298,7 @@ i18n.use(initReactI18next).init({
       webhooks: viWebhooks,
       workstations: viWorkstations,
       "orca-servers": viOrcaServers,
+      "company-simulator": viCompanySimulator,
     },
     zh: {
       common: zhCommon, sidebar: zhSidebar, topbar: zhTopbar, login: zhLogin,
@@ -313,6 +321,7 @@ i18n.use(initReactI18next).init({
       webhooks: zhWebhooks,
       workstations: zhWorkstations,
       "orca-servers": zhOrcaServers,
+      "company-simulator": zhCompanySimulator,
     },
     ko: {
       common: koCommon, sidebar: koSidebar, topbar: koTopbar, login: koLogin,
@@ -332,6 +341,7 @@ i18n.use(initReactI18next).init({
       "v3-capabilities": koV3Capabilities,
       backup: koBackup,
       "orca-servers": koOrcaServers,
+      "company-simulator": koCompanySimulator,
     },
     ru: {
       common: ruCommon, sidebar: ruSidebar, topbar: ruTopbar, login: ruLogin,
@@ -354,6 +364,7 @@ i18n.use(initReactI18next).init({
       webhooks: ruWebhooks,
       workstations: ruWorkstations,
       "orca-servers": ruOrcaServers,
+      "company-simulator": ruCompanySimulator,
     },
   },
   ns: [...ns],

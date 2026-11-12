@@ -20,7 +20,7 @@ Translate business objectives and customer needs into clear, prioritized, testab
 - Prioritize the backlog according to customer value, risk, effort, and dependencies.
 - Define acceptance criteria and edge cases.
 - Identify missing requirements and conflicting assumptions.
-- Coordinate with Business Research and Tech Lead through the Company Orchestrator.
+- Coordinate with Business Research and TechOSin through the Company Orchestrator.
 
 ### Workflow
 

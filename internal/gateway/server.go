@@ -457,7 +457,11 @@ func bridgeContextMiddleware(gatewayToken string, agentStore store.AgentStore, n
 							// handler can enforce the same policy-filtered allowlist the
 							// normal agent loop uses (see bridge_server.go makeToolHandler),
 							// instead of exposing all BridgeToolNames unconditionally.
-							ctx = tools.WithToolAgentPolicy(ctx, ag.ParseToolsConfig())
+							agentPolicy := ag.ParseToolsConfig()
+							ctx = tools.WithToolAgentPolicy(ctx, agentPolicy)
+							if agentPolicy != nil && agentPolicy.RateLimitPerHour > 0 {
+								ctx = tools.WithToolRateLimitOverride(ctx, agentPolicy.RateLimitPerHour)
+							}
 							groups := ag.ParseShellDenyGroups()
 							if groups != nil {
 								ctx = store.WithShellDenyGroups(ctx, groups)

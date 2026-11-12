@@ -1,0 +1,31 @@
+{
+  "title": "公司模拟器",
+  "description": "在 3D 办公室中观看智能体团队工作。",
+  "selectTeam": "选择团队",
+  "empty": {
+    "noTeams": "还没有智能体团队",
+    "noTeamsDescription": "创建一个团队即可打开它的办公室。",
+    "goToTeams": "前往团队",
+    "noMembers": "该团队没有成员。"
+  },
+  "status": {
+    "working": "工作中",
+    "sleeping": "睡眠中"
+  },
+  "delegation": {
+    "to": "已委派给 {{name}}",
+    "from": "正在为 {{name}} 工作"
+  },
+  "panel": {
+    "title": "员工",
+    "noActivity": "暂无活动。",
+    "back": "全部员工"
+  },
+  "run": {
+    "started": "运行开始",
+    "completed": "运行完成",
+    "failed": "运行失败",
+    "cancelled": "运行已取消"
+  },
+  "webglUnsupported": "此浏览器无法显示 3D 视图，请使用员工列表。"
+}

@@ -27,6 +27,7 @@ export const ROUTES = {
   PROVIDERS: "/providers",
   PROVIDER_DETAIL: "/providers/:id",
   TEAMS: "/teams",
+  COMPANY_SIMULATOR: "/company-simulator",
   TEAM_DETAIL: "/teams/:id",
   BUILTIN_TOOLS: "/builtin-tools",
   CLI_CREDENTIALS: "/cli-credentials",

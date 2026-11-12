@@ -1,0 +1,28 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "ok": true,
+  "result": {
+    "outcome": {
+      "kind": "structured",
+      "sessionId": "claude_6ede7e3d_5e77_4590_9757_ec7512e489f2",
+      "handle": "structured-agent-session-claude_6ede7e3d_5e77_4590_9757_ec7512e489f2",
+      "tabId": "structured-agent-session-claude_6ede7e3d_5e77_4590_9757_ec7512e489f2"
+    },
+    "worktreeId": "00000000-0000-0000-0000-000000000000::/home/user/orca/workspaces/orca-fixture-repo/fx-claude",
+    "receipt": {
+      "mode": "structured",
+      "preferred": "structured",
+      "reason": "requested",
+      "detail": "Started a structured chat session, as requested."
+    },
+    "prompt": {
+      "delivery": "submit",
+      "outcome": "journaled",
+      "messageId": "1700000000000-17000000000001700000000000000000"
+    },
+    "operationId": "1700000000000-17000000000001700000000000000000"
+  },
+  "_meta": {
+    "runtimeId": "00000000-0000-0000-0000-000000000000"
+  }
+}

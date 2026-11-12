@@ -2,6 +2,8 @@
 
 package sqlitestore
 
+import "database/sql"
+
 const sqliteOrcaServersMigration = `CREATE TABLE IF NOT EXISTS orca_servers (
     id                 TEXT PRIMARY KEY,
     tenant_id          TEXT NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
@@ -19,3 +21,24 @@ const sqliteOrcaServersMigration = `CREATE TABLE IF NOT EXISTS orca_servers (
     UNIQUE (tenant_id, label)
 );
 CREATE INDEX IF NOT EXISTS idx_orca_servers_checked ON orca_servers (last_checked_at);`
+
+func sqliteOrcaServerAgentsMigrationPatch(db *sql.DB) (string, error) {
+	columns := []struct{ name, def string }{
+		{"agents", "TEXT NOT NULL DEFAULT '[]'"},
+		{"agent_health", "TEXT NOT NULL DEFAULT '{}'"},
+	}
+	patch := ""
+	for _, c := range columns {
+		has, err := sqliteColumnExists(db, "orca_servers", c.name)
+		if err != nil {
+			return "", err
+		}
+		if !has {
+			patch += "ALTER TABLE orca_servers ADD COLUMN " + c.name + " " + c.def + ";\n"
+		}
+	}
+	if patch == "" {
+		patch = "SELECT 1;"
+	}
+	return patch, nil
+}

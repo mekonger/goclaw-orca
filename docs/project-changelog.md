@@ -4,6 +4,24 @@ Significant changes, features, and fixes in reverse chronological order.
 
 ---
 
+## 2026-11-11
+
+### Orca coding-agent routing
+
+**Features**
+
+- Per-server coding agents (`agents`, `agent_health` on `orca_servers`) with `PUT /v1/orca-servers/{id}/agents` and an Agents editor plus health badges on the Orca Servers page.
+- `--agent auto` on `orca worktree create` / `agent launch` is rewritten by the gateway before deny checks: `/planning` → planning entry, `/cook` → healthy then unknown `hard` entry then fallback, otherwise Jev (`jev-*` provider, threshold from provider settings, default 0.6) or the fallback. Output starts with a `routed:` line; decisions logged as `orca.route`.
+- Agent health: `orca account list --json` on every refresh and Check marks signed-in agents healthy and signed-out ones unhealthy; "Unknown TUI agent" launch errors mark the entry unhealthy; unhealthy resets to unknown after 30 minutes or on Check.
+
+**Changes**
+
+- `--agent auto` that cannot be routed (no Orca server, `--server default`, `--model`/`--effort` given, repeated flags, no usable agent) is refused; orca is not run. Explicit agents always run, with a warning when not configured.
+- Orca preset tip and `orca-cli` skill (1.5.0) tell agents to use `--agent auto`. Existing `orca` secure-CLI rows keep their stored tip until edited.
+- Schema: PostgreSQL migration `000102` and SQLite schema 63 add `agents` (default `[]`) and `agent_health` (default `{}`). No seed for existing servers.
+
+---
+
 ## 2026-11-09
 
 ### Trace model column + Antigravity force-model toggle

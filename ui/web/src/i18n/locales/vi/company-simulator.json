@@ -1,0 +1,31 @@
+{
+  "title": "Mô phỏng công ty",
+  "description": "Xem nhóm agent làm việc trong văn phòng 3D.",
+  "selectTeam": "Chọn nhóm",
+  "empty": {
+    "noTeams": "Chưa có nhóm agent",
+    "noTeamsDescription": "Tạo một nhóm để mở văn phòng của nhóm.",
+    "goToTeams": "Đến trang Nhóm",
+    "noMembers": "Nhóm này chưa có thành viên."
+  },
+  "status": {
+    "working": "Đang làm việc",
+    "sleeping": "Đang ngủ"
+  },
+  "delegation": {
+    "to": "Giao việc cho {{name}}",
+    "from": "Làm việc cho {{name}}"
+  },
+  "panel": {
+    "title": "Nhân viên",
+    "noActivity": "Chưa có hoạt động.",
+    "back": "Tất cả nhân viên"
+  },
+  "run": {
+    "started": "Bắt đầu chạy",
+    "completed": "Chạy xong",
+    "failed": "Chạy lỗi",
+    "cancelled": "Đã hủy chạy"
+  },
+  "webglUnsupported": "Trình duyệt này không hỗ trợ chế độ 3D. Hãy dùng danh sách nhân viên."
+}

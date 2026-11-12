@@ -4,7 +4,7 @@ description: Use this skill when operating the Orca desktop app/runtime through 
 license: Proprietary. Part of GoClaw bundled skills.
 metadata:
   author: GoClaw
-  version: "1.4.0"
+  version: "1.5.0"
 ---
 
 # Orca CLI
@@ -176,17 +176,28 @@ A failed comment update is not worth surfacing unless the user asked about Orca 
 Start a coding agent in a **new** worktree:
 
 ```bash
-orca worktree create --name <task> --no-parent --agent claude --prompt "<task brief>" --json
+orca --server <label> worktree create --name <task> --no-parent --agent auto --prompt "<task brief>" --json
 ```
 
 Start one in an **existing** worktree:
 
 ```bash
-orca agent launch --agent codex --worktree id:<repoId>::<path> --prompt "<task brief>" --json
+orca --server <label> agent launch --agent auto --worktree id:<repoId>::<path> --prompt "<task brief>" --json
 ```
 
-- Agent ids include `claude`, `codex`, and other agents installed in Orca. Add
-  `--model <id>` / `--effort <level>` only when the user names them.
+- **Default to `--agent auto`** with no `--model` / `--effort`. The gateway picks an agent
+  and model from the server's configured coding agents and prints a first line such as
+  `routed: --agent claude --model sonnet (jev 0.86)`. Report that line.
+  - A prompt starting with `/planning` goes to the server's planning agent; `/cook` goes to
+    its hard agent; other work is picked by the router or falls back to the server's
+    fallback agent.
+  - `--agent auto` is refused (orca never runs) when: no `--server <label>` points at an
+    Orca server, `--model`/`--effort` is also passed, `--agent`/`--model`/`--effort` is
+    repeated, the server has no coding agents, or no agent is usable. The error says what
+    to do; usually re-run with `--server <label>` or name an agent.
+- Name an agent (`--agent claude`, `--agent codex`, …) only when the user asks for one or
+  when escalating a failed run; add `--model <id>` / `--effort <level>` only when the user
+  names them. An agent not configured on the server still runs, with a `warning:` line.
 - Read `result.launch`: `outcome.kind` (`structured` chat or `terminal`), `outcome.handle`
   (the only handle to use afterwards), and `prompt.outcome`.
 - A **full handoff** is done when you have reported the worktree id and agent handle and

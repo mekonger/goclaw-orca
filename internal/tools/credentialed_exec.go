@@ -378,17 +378,33 @@ func (t *ExecTool) executeCredentialed(ctx context.Context, cred *store.SecureCL
 	if selectErr != nil {
 		return selectErr
 	}
+	if r := t.credentialedDenyCheck(cred, binary, args); r != nil {
+		return r
+	}
+	route, args, routeErr := t.routeOrcaAgent(ctx, cred, binary, args)
+	if routeErr != nil {
+		return routeErr
+	}
+	if route != nil {
+		var sink *rawStdoutSink
+		ctx, sink = withRawStdoutSink(ctx)
+		defer func() { t.recordOrcaLaunchHealth(context.WithoutCancel(ctx), route, sink.out) }()
+	}
+	res := t.runCredentialed(ctx, cred, binary, args, cwd, sandboxKey)
+	if route != nil && route.Note != "" && res != nil {
+		res.ForLLM = route.Note + "\n" + res.ForLLM
+	}
+	return res
+}
+
+func (t *ExecTool) runCredentialed(ctx context.Context, cred *store.SecureCLIBinary,
+	binary string, args []string, cwd string, sandboxKey string) *Result {
 
 	// Step 2: Per-binary deny check (deny_args)
-	denyArgs, allowAudits := applyCommandKeywordAllowlist(binary, args, t.commandKeywordAllowlistSnapshot())
-	if p := matchesBinaryDeny(denyArgs, cred.DenyArgs); p != "" {
-		return credentialedDenyError(binary, args, p)
+	if r := t.credentialedDenyCheck(cred, binary, args); r != nil {
+		return r
 	}
-	// Per-binary verbose deny check (deny_verbose) — per-arg start-anchored match
-	// so `-v` blocks `-v`/`-vv`/`-v=1` but not `--version`.
-	if p := matchesBinaryVerbose(args, cred.DenyVerbose); p != "" {
-		return credentialedDenyError(binary, args, p)
-	}
+	_, allowAudits := applyCommandKeywordAllowlist(binary, args, t.commandKeywordAllowlistSnapshot())
 	for _, audit := range allowAudits {
 		slog.Info("security.command_keyword_allowlist",
 			"binary", audit.Command,
@@ -512,6 +528,17 @@ func (t *ExecTool) executeCredentialed(ctx context.Context, cred *store.SecureCL
 		return t.executeCredentialedSandbox(ctx, absPath, args, cwd, sandboxKey, envMap, timeout)
 	}
 	return t.executeCredentialedHost(ctx, absPath, args, cwd, envMap, timeout)
+}
+
+func (t *ExecTool) credentialedDenyCheck(cred *store.SecureCLIBinary, binary string, args []string) *Result {
+	denyArgs, _ := applyCommandKeywordAllowlist(binary, args, t.commandKeywordAllowlistSnapshot())
+	if p := matchesBinaryDeny(denyArgs, cred.DenyArgs); p != "" {
+		return credentialedDenyError(binary, args, p)
+	}
+	if p := matchesBinaryVerbose(args, cred.DenyVerbose); p != "" {
+		return credentialedDenyError(binary, args, p)
+	}
+	return nil
 }
 
 // userCredFromBinary synthesizes adapter credential input from LookupByBinary's
@@ -701,6 +728,7 @@ func (t *ExecTool) executeCredentialedHost(ctx context.Context, absPath string, 
 
 	select {
 	case err := <-done:
+		captureRawStdout(ctx, stdout.String())
 		return formatCredentialedResult(absPath, args, t.extractCredentialedMedia(ctx, stdout.String()), stderr.String(), err, ctx, timeout)
 
 	case <-ctx.Done():
@@ -746,6 +774,7 @@ func (t *ExecTool) executeCredentialedSandbox(ctx context.Context, absPath strin
 		return ErrorResult(fmt.Sprintf("credentialed sandbox exec: %v", err))
 	}
 
+	captureRawStdout(ctx, result.Stdout)
 	output := t.extractCredentialedMedia(ctx, result.Stdout)
 	if result.Stderr != "" {
 		if output != "" {
